@@ -1,3 +1,4 @@
+import type { WordExample } from './WordExample';
 import { isValidPronounce, type WordPronounce } from './WordPronounce';
 
 export interface WordTranslation {
@@ -5,7 +6,7 @@ export interface WordTranslation {
   typeText: string;
   translation: string;
   definition: string;
-  example: string;
+  example: WordExample;
   phonetic: string;
   audio: WordPronounce;
   frequency: number;
@@ -33,6 +34,9 @@ export enum WordCodeType {
   "感叹词" = "INTERJECTION",
 }
 
+
+export const VERBS_TEXT = ["TRANSITIVE_VERB", "INTRANSITIVE_VERB"]
+
 export function isValidTranslation(translation: WordTranslation): boolean {
   if (!translation) {
     return false;
@@ -56,6 +60,18 @@ export function isValidTranslation(translation: WordTranslation): boolean {
 
   if (!isValidPronounce(translation.audio)) {
     return false;
+  }
+
+  // 判断词性和词性文本是否对应
+  if (translation.type !== WordType[translation.typeText as keyof typeof WordType]) {
+    // 如果是动词 可以用及物和不及物
+    if (translation.type!== WordType.VERB) {
+      return false;
+    }
+
+    if (!VERBS_TEXT.includes(translation.typeText)) {
+      return false;
+    }
   }
 
   return true;
