@@ -20,6 +20,8 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ data, onChange }) => {
   };
 
   const options = {
+    formatOnPaste: true,
+    formatOnType: true,
     selectOnLineNumbers: true
   };
 
