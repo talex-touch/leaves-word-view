@@ -9,6 +9,7 @@ import { isValidPronounce, isValidTranslationList, isValidWordDerivedList } from
 import WordDerivedEditor from './WordDerivedEditor';
 import WordImageEditor from './WordImageEditor';
 import WordAffixEditor from './WordAffixEditor';
+import WordTransformEditor from './WordTransformEditor';
 
 export type Prop = {
   word_head?: string;
@@ -124,7 +125,14 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
           />
         </Form.Item>
 
-        <Form.Item name="derived" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
+        <Form.Item name="parts" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
+          <WordTransformEditor
+            initialTransforms={currentContent.transform}
+            onSave={(updatedTransforms) => setCurrentContent({ ...currentContent, transform: updatedTransforms })}
+          />
+        </Form.Item>
+
+        <Form.Item name="derived" label="单词网络" rules={[{ required: true, message: '请编辑单词网络!' }]}>
           <WordDerivedEditor
             initialDerivedWords={currentContent.derived}
             onSave={(updatedDerivedWords) => setCurrentContent({ ...currentContent, derived: updatedDerivedWords })}
