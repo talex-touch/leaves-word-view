@@ -1,12 +1,12 @@
 // src/components/Word/types/WordAffixType.ts
 export enum WordAffixType {
-  NONE = "无变换形式",
-  PREFIX = "前缀",
-  SUFFIX = "后缀",
-  INFIX = "中缀",
-  ACRONYM = "缩略词",
-  ROOT = "词根",
-  STEM = "词干"
+  "NONE" = "整体",
+  "PREFIX" = "前缀",
+  "SUFFIX" = "后缀",
+  "INFIX" = "中缀",
+  "ACRONYM" = "缩略词",
+  "ROOT" = "词根",
+  "STEM" = "词干"
 }
 
 export const WordAffixTypeDescription: { [key in WordAffixType]: string } = {

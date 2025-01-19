@@ -1,4 +1,4 @@
-import type { WordPronounce } from './WordPronounce';
+import { emptyWordPronounce, type WordPronounce } from './WordPronounce';
 
 export enum WordExampleTypeEnum {
   SENTENCE = "句子",
@@ -12,4 +12,15 @@ export interface WordExample {
   sentence: string;
   translation: string;
   audio: WordPronounce;
+}
+
+export function emptyExample() {
+  return {
+    type: WordExampleTypeEnum.SENTENCE,
+    addon: '',
+    highlight: '',
+    sentence: '',
+    translation: '',
+    audio: emptyWordPronounce(),
+  }
 }

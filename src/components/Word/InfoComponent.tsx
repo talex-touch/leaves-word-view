@@ -3,18 +3,20 @@ import MonacoEditor, { type ChangeHandler, type EditorDidMount } from 'react-mon
 import './info-style.css'
 
 interface InfoComponentProps {
-  data: string; // 接受外界传入的data文本数据
+  data: string;
+  onChange?: (newValue: string) => void;
 }
 
-const InfoComponent: React.FC<InfoComponentProps> = ({ data }) => {
+const InfoComponent: React.FC<InfoComponentProps> = ({ data, onChange }) => {
   const [code, setCode] = useState(data);
 
   const editorDidMount: EditorDidMount = (editor) => {
     editor.focus();
   };
 
-  const onChange: ChangeHandler = (newValue) => {
+  const onInnerChange: ChangeHandler = (newValue) => {
     setCode(newValue);
+    onChange?.(newValue);
   };
 
   const options = {
@@ -30,7 +32,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ data }) => {
         theme="vs-light"
         value={code}
         options={options}
-        onChange={onChange}
+        onChange={onInnerChange}
         editorDidMount={editorDidMount}
       />
     </div >

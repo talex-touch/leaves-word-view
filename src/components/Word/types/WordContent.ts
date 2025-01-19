@@ -14,7 +14,7 @@ export interface WordContent {
   // thumbnail: string;
   remember: string;
   story: string;
-  wordTransform: WordTransform[];
+  transform: WordTransform[];
   translation: WordTranslation[];
   examplePhrases: WordExample[];
   parts: WordAffixPart[];
@@ -35,7 +35,7 @@ export function emptyWordContent(): WordContent {
     // thumbnail: '',
     remember: '',
     story: '',
-    wordTransform: [],
+    transform: [],
     translation: [],
     examplePhrases: [],
     parts: [],
@@ -96,9 +96,7 @@ export function parseWordContent(text: string): [WordContent | null, boolean] {
     }
 
   } catch (error) {
-
     return [null, false];
-
   }
 }
 

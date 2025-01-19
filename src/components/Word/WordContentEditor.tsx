@@ -5,41 +5,48 @@ import InfoComponent from './InfoComponent'; // 假设自定义组件名为InfoC
 import WordPronounceEditor from './WordPronounceEditor'; // 添加导入语句
 import WordTranslationEditor from './WordTranslationEditor'; // 添加导入语句
 import { emptyWordContent, parseWordContent } from './types/WordContent';
-import { isValidPronounce, isValidTranslationList, isValidWordDerivedList, type WordTranslation } from './types';
+import { isValidPronounce, isValidTranslationList, isValidWordDerivedList } from './types';
 import WordDerivedEditor from './WordDerivedEditor';
 import WordImageEditor from './WordImageEditor';
+import WordAffixEditor from './WordAffixEditor';
 
 export type Prop = {
   word_head?: string;
   info?: string;
   editable?: boolean;
+  onSubmit?: (wordContent: string) => void;
 }
 
-const WordContentEditor: React.FC<Prop> = ({ word_head, info }) => {
+const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
   const [form] = Form.useForm();
   const [currentContent, setCurrentContent] = useState(emptyWordContent());
   const [isTransformModalVisible, setTransformModalVisible] = useState(false);
   const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [isAdvancedFeaturesEnabled, setAdvancedFeaturesEnabled] = useState(false);
+  const [infoData, setInfoData] = useState(info || '');
 
-  useEffect(() => {
-    if (info) {
-      const [parsedInfo, parseStatus] = parseWordContent(info);
+  function tryParseInfo(info: string) {
+    const [parsedInfo, parseStatus] = parseWordContent(info);
 
-      if (parsedInfo && !parseStatus) {
-        Modal.confirm({
-          title: '结构不一致',
-          content: '传入的 info 结构与 WordContent 不一致，是否强行转换？',
-          onOk() {
-            setCurrentContent(parsedInfo);
-          }
-        });
-      } else if (parsedInfo) {
-        setCurrentContent(parsedInfo);
-      }
+    if (parsedInfo && !parseStatus) {
+      Modal.confirm({
+        title: '结构不一致',
+        content: '传入的 info 结构与 WordContent 不一致，是否强行转换？',
+        onOk() {
+          setCurrentContent(parsedInfo);
+          setInfoData(JSON.stringify(parsedInfo, null, 2));
+        }
+      });
+    } else if (parsedInfo) {
+      setCurrentContent(parsedInfo);
+      setInfoData(JSON.stringify(parsedInfo, null, 2));
     }
 
     form.setFieldsValue(currentContent);
+  }
+
+  useEffect(() => {
+    tryParseInfo(info || '')
   }, [form, currentContent, info]);
 
   const handleSave = () => {
@@ -68,14 +75,26 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info }) => {
 
       message.success("检验通过！")
       setCurrentContent(values);
+      setInfoData(JSON.stringify(currentContent, null, 2));
       setDrawerVisible(false);
+
+      onSubmit?.(JSON.stringify(currentContent));
     });
   };
+
+  const handleInfoChange = (newInfo: string) => {
+    if (infoData === newInfo) {
+      return;
+    }
+
+    setInfoData(newInfo);
+    tryParseInfo(newInfo);
+  }
 
   return (
     <Form form={form} layout="vertical">
       <Form.Item label="">
-        <InfoComponent data={info || ''} />
+        <InfoComponent onChange={handleInfoChange} data={infoData} />
       </Form.Item>
       <Button type="dashed" onClick={() => setDrawerVisible(true)}>
         进入单词编辑器
@@ -105,13 +124,20 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info }) => {
           />
         </Form.Item>
 
-        <Form.Item label="词形变化">
+        <Form.Item name="derived" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
           <WordDerivedEditor
             initialDerivedWords={currentContent.derived}
             onSave={(updatedDerivedWords) => setCurrentContent({ ...currentContent, derived: updatedDerivedWords })}
           />
         </Form.Item>
 
+        <Form.Item name="parts" label="单词组成" rules={[{ required: true, message: '请编辑单词组成!' }]}>
+          <WordAffixEditor
+            initialAffixParts={currentContent.parts}
+            onSave={(updatedAffixParts) => setCurrentContent({ ...currentContent, parts: updatedAffixParts })}
+          />
+        </Form.Item>
+        
         <Form.Item name="advancedFeatures" valuePropName="checked">
           <Checkbox onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
         </Form.Item>

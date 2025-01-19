@@ -5,6 +5,7 @@ import { emptyWordPronounce } from './types/WordPronounce';
 import { WordTranslation, WordType } from './types/WordTranslation';
 import WordPronounceEditor from './WordPronounceEditor';
 import WordImageEditor from './WordImageEditor';
+import { emptyExample } from './types';
 
 interface WordTranslationEditorProps {
   initialTranslations: WordTranslation[];
@@ -136,26 +137,6 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ initialTr
         >
           删除
         </a>,
-        <a
-          key="edit-image"
-          onClick={() => {
-            // 打开 WordImageEditor 进行图片编辑
-            // 这里假设有一个状态来控制 WordImageEditor 的显示
-            // 例如：setShowImageEditor(true);
-            console.log('Edit Image');
-          }}
-        >
-          编辑图片
-        </a>,
-        <a
-          key="delete-image"
-          onClick={() => {
-            // 删除图片的逻辑
-            console.log('Delete Image');
-          }}
-        >
-          删除图片
-        </a>,
       ],
     },
   ];
@@ -182,7 +163,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ initialTr
               typeText: `${targetType}`,
               translation: '',
               definition: '',
-              example: '',
+              example: emptyExample(),
               phonetic: '',
               audio: emptyWordPronounce(),
               frequency: 0,
