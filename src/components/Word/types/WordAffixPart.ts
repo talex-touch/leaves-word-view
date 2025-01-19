@@ -25,3 +25,31 @@ export interface WordAffixPart {
   data: { [key: string]: string };
   description: string;
 }
+
+export function isValidWordAffixPart(affixPart: WordAffixPart): boolean {
+  if (!affixPart) {
+    return false;
+  }
+
+  if (!affixPart.type) {
+    return false;
+  }
+
+  if (!affixPart.content) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isValidWordAffixPartList(affixPartList: WordAffixPart[]): boolean {
+  if (!Array.isArray(affixPartList)) {
+    return false;
+  }
+
+  if (!affixPartList || affixPartList.length === 0) {
+    return false;
+  }
+
+  return affixPartList.every(isValidWordAffixPart);
+}

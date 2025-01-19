@@ -27,3 +27,44 @@ export enum TransformType {
   CONDITIONAL = "条件式形式",
   SUBJUNCTIVE = "虚拟语气形式"
 }
+
+// 校验是否为合法的变换词对象
+export function isValidWordTransform(transform: WordTransform): boolean {
+  if (!transform) {
+    return false;
+  }
+
+  if (!transform.id) {
+    return false;
+  }
+
+  if (!transform.type) {
+    return false;
+  }
+
+  if (!transform.content) {
+    return false;
+  }
+
+  if (!transform.data || Object.keys(transform.data).length === 0) {
+    return false;
+  }
+
+  if (!transform.example) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isValidWordTransformList(transformList: WordTransform[]): boolean {
+  if (!Array.isArray(transformList)) {
+    return false;
+  }
+
+  if (!transformList || transformList.length === 0) {
+    return false;
+  }
+
+  return transformList.every(isValidWordTransform);
+}

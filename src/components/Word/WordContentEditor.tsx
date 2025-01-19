@@ -5,7 +5,7 @@ import InfoComponent from './InfoComponent'; // 假设自定义组件名为InfoC
 import WordPronounceEditor from './WordPronounceEditor'; // 添加导入语句
 import WordTranslationEditor from './WordTranslationEditor'; // 添加导入语句
 import { emptyWordContent, parseWordContent } from './types/WordContent';
-import { isValidPronounce, isValidTranslationList, isValidWordDerivedList } from './types';
+import { isValidPronounce, isValidTranslationList, isValidWordAffixPartList, isValidWordDerivedList, isValidWordTransformList } from './types';
 import WordDerivedEditor from './WordDerivedEditor';
 import WordImageEditor from './WordImageEditor';
 import WordAffixEditor from './WordAffixEditor';
@@ -64,13 +64,28 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
         return;
       }
 
+      if (currentContent.img.length) {
+        message.error("图片列表未通过检验！")
+        return;
+      }
+
       if (isValidTranslationList(currentContent.translation)) {
         message.error("翻译列表未通过检验！")
         return;
       }
 
-      if (isValidWordDerivedList(currentContent.translation)) {
+      if (isValidWordDerivedList(currentContent.derived)) {
         message.error("派生词列表未通过检验！")
+        return;
+      }
+
+      if (isValidWordTransformList(currentContent.transform)) {
+        message.error("派生词列表未通过检验！")
+        return;
+      }
+
+      if (isValidWordAffixPartList(currentContent.parts)) {
+        message.error("单词组成列表未通过检验！")
         return;
       }
 
