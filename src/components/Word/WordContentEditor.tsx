@@ -5,11 +5,12 @@ import InfoComponent from './InfoComponent'; // 假设自定义组件名为InfoC
 import WordPronounceEditor from './WordPronounceEditor'; // 添加导入语句
 import WordTranslationEditor from './WordTranslationEditor'; // 添加导入语句
 import { emptyWordContent, parseWordContent } from './types/WordContent';
-import { isValidPronounce, isValidTranslationList, isValidWordAffixPartList, isValidWordDerivedList, isValidWordTransformList } from './types';
+import { isValidPronounce, isValidTranslationList, isValidWordAffixPartList, isValidWordDerivedList, isValidWordTransformList, WordExampleTypeEnum } from './types';
 import WordDerivedEditor from './WordDerivedEditor';
 import WordImageEditor from './WordImageEditor';
 import WordAffixEditor from './WordAffixEditor';
 import WordTransformEditor from './WordTransformEditor';
+import WordExampleListEditor from './WordExampleListEditor';
 
 export type Prop = {
   word_head?: string;
@@ -64,7 +65,7 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
         return;
       }
 
-      if (currentContent.img.length) {
+      if (!currentContent.img.length) {
         message.error("图片列表未通过检验！")
         return;
       }
@@ -74,13 +75,18 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
         return;
       }
 
+      if (!currentContent.examplePhrases.length || !(currentContent.examplePhrases.every(example => example.type === WordExampleTypeEnum.PHRASE && example.translation))) {
+        message.error("短语列表未通过检验！")
+        return;
+      }
+
       if (isValidWordDerivedList(currentContent.derived)) {
-        message.error("派生词列表未通过检验！")
+        message.error("单词网络列表未通过检验！")
         return;
       }
 
       if (isValidWordTransformList(currentContent.transform)) {
-        message.error("派生词列表未通过检验！")
+        message.error("词形变化列表未通过检验！")
         return;
       }
 
@@ -137,6 +143,13 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
           <WordTranslationEditor
             initialTranslations={currentContent.translation}
             onSave={(updatedTranslations) => setCurrentContent({ ...currentContent, translation: updatedTranslations })}
+          />
+        </Form.Item>
+
+        <Form.Item name="examplePhrases" label="短语" rules={[{ required: true, message: '请编辑短语!' }]}>
+          <WordExampleListEditor
+            value={currentContent.examplePhrases}
+            onChange={(updatedExamplePhrased) => setCurrentContent({ ...currentContent, examplePhrases: updatedExamplePhrased })}
           />
         </Form.Item>
 

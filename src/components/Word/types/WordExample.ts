@@ -22,5 +22,5 @@ export function emptyExample() {
     sentence: '',
     translation: '',
     audio: emptyWordPronounce(),
-  }
+  } as WordExample;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Modal, Input, Form, message } from 'antd';
+import Segmented from 'antd/es/segmented'; // 添加 Segmented 组件的导入
 import { emptyExample, WordExample, WordExampleTypeEnum } from './types/WordExample';
 import WordPronounceEditor from './WordPronounceEditor';
 
@@ -55,18 +56,20 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
           <Form.Item
             name="type"
             label="类型"
-            rules={[{ required: !readonly, message: '请选择类型!' }]} // 根据 readonly 属性设置 required 规则
+            rules={[{ required: !readonly, message: '请选择类型!' }]}
           >
-            <Input
-              type="text"
-              placeholder="类型"
+            <Segmented
+              options={[
+                { label: WordExampleTypeEnum.SENTENCE, value: WordExampleTypeEnum.SENTENCE },
+                { label: WordExampleTypeEnum.PHRASE, value: WordExampleTypeEnum.PHRASE },
+              ]}
               disabled={readonly}
             />
           </Form.Item>
           <Form.Item
             name="addon"
             label="附加信息"
-            rules={[{ required: !readonly, message: '请输入附加信息!' }]} // 根据 readonly 属性设置 required 规则
+            rules={[{ required: !readonly, message: '请输入附加信息!' }]}
           >
             <Input
               type="text"
@@ -77,7 +80,7 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
           <Form.Item
             name="highlight"
             label="高亮部分"
-            rules={[{ required: !readonly, message: '请输入高亮部分!' }]} // 根据 readonly 属性设置 required 规则
+            rules={[{ required: !readonly, message: '请输入高亮部分!' }]}
           >
             <Input
               type="text"
@@ -88,7 +91,7 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
           <Form.Item
             name="sentence"
             label="句子"
-            rules={[{ required: !readonly, message: '请输入句子!' }]} // 根据 readonly 属性设置 required 规则
+            rules={[{ required: !readonly, message: '请输入句子!' }]}
           >
             <Input
               type="text"
@@ -99,7 +102,7 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
           <Form.Item
             name="translation"
             label="翻译"
-            rules={[{ required: !readonly, message: '请输入翻译!' }]} // 根据 readonly 属性设置 required 规则
+            rules={[{ required: !readonly, message: '请输入翻译!' }]}
           >
             <Input
               type="text"
@@ -110,7 +113,7 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
           <Form.Item
             name={['audio', 'content']}
             label="音频"
-            rules={[{ required: !readonly, message: '请配置音频!' }]} // 根据 readonly 属性设置 required 规则
+            rules={[{ required: !readonly, message: '请配置音频!' }]}
           >
             <WordPronounceEditor
               value={example.audio}
