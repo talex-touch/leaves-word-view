@@ -1,5 +1,5 @@
-import { Form, Input, Button, Modal, Drawer, message, Checkbox } from 'antd'; // 添加 message 导入
-import { useEffect, useState } from 'react';
+import { Form, Input, Button, Drawer, message, Checkbox } from 'antd'; // 添加 message 导入
+import { useEffect, useMemo, useState } from 'react';
 
 import InfoComponent from './InfoComponent'; // 假设自定义组件名为InfoComponent
 import WordPronounceEditor from './WordPronounceEditor'; // 添加导入语句
@@ -19,29 +19,34 @@ export type Prop = {
   onSubmit?: (wordContent: string) => void;
 }
 
-const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
+enum ParseStatus {
+  UNKNOWN = -1,
+  NORMAL = 0,
+  ERROR = 1,
+  SYNCHORNISED = 2
+}
+
+const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
   const [form] = Form.useForm();
   const [currentContent, setCurrentContent] = useState(emptyWordContent());
-  const [isTransformModalVisible, setTransformModalVisible] = useState(false);
   const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [isAdvancedFeaturesEnabled, setAdvancedFeaturesEnabled] = useState(false);
   const [infoData, setInfoData] = useState(info || '');
+  const [parseStatus, setParseStatus] = useState<ParseStatus>(ParseStatus.NORMAL); // 新增状态来记录解析状态
 
   function tryParseInfo(info: string) {
     const [parsedInfo, parseStatus] = parseWordContent(info);
 
     if (parsedInfo && !parseStatus) {
-      Modal.confirm({
-        title: '结构不一致',
-        content: '传入的 info 结构与 WordContent 不一致，是否强行转换？',
-        onOk() {
-          setCurrentContent(parsedInfo);
-          setInfoData(JSON.stringify(parsedInfo, null, 2));
-        }
-      });
+      setParseStatus(ParseStatus.ERROR);
+
+      console.warn("解析失败，请检查输入格式！")
     } else if (parsedInfo) {
-      setCurrentContent(parsedInfo);
       setInfoData(JSON.stringify(parsedInfo, null, 2));
+      setCurrentContent(parsedInfo);
+      setParseStatus(ParseStatus.SYNCHORNISED);
+    } else {
+      setParseStatus(ParseStatus.UNKNOWN);
     }
 
     form.setFieldsValue(currentContent);
@@ -113,10 +118,49 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
     tryParseInfo(newInfo);
   }
 
+  const renderStatusTip = useMemo(() => {
+    console.log("re render", parseStatus)
+
+    if (parseStatus === ParseStatus.NORMAL) return null
+
+    if (parseStatus === ParseStatus.SYNCHORNISED) {
+      return <span>
+        已同步至单词编辑器
+      </span>
+    }
+
+    if (parseStatus === ParseStatus.ERROR) {
+      return <span>
+        结构不一致，<Button color='primary' variant="text" onClick={() => {
+          const [parsedInfo] = parseWordContent(info!);
+          if (!parsedInfo) {
+            message.error("解析失败，请检查输入格式！")
+            return;
+          }
+
+          setInfoData(JSON.stringify(parsedInfo, null, 2));
+          setCurrentContent(parsedInfo!);
+          setParseStatus(ParseStatus.SYNCHORNISED);
+        }}>点击这里强行转换</Button>
+      </span>
+    }
+
+    if (parseStatus === ParseStatus.UNKNOWN) {
+      return <span>
+        未知的格式，无法完成解析
+      </span>
+    }
+
+  }, [parseStatus, currentContent, tryParseInfo])
+
   return (
     <Form form={form} layout="vertical">
       <Form.Item label="">
         <InfoComponent onChange={handleInfoChange} data={infoData} />
+
+        <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>
+          {renderStatusTip}
+        </div>
       </Form.Item>
       <Button type="dashed" onClick={() => setDrawerVisible(true)}>
         进入单词编辑器
@@ -136,7 +180,7 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
           <WordPronounceEditor value={currentContent.americanPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, americanPronounce: pronounce })} />
         </Form.Item>
         <Form.Item name="img" label="图片列表" rules={[{ required: true, message: '请输入图片列表!' }]}>
-          <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({...currentContent, img: img })} />
+          <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
         </Form.Item>
 
         <Form.Item name="translation" label="翻译" rules={[{ required: true, message: '请编辑翻译内容!' }]}>
@@ -173,7 +217,7 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
             onSave={(updatedAffixParts) => setCurrentContent({ ...currentContent, parts: updatedAffixParts })}
           />
         </Form.Item>
-        
+
         <Form.Item name="advancedFeatures" valuePropName="checked">
           <Checkbox onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
         </Form.Item>
@@ -196,16 +240,8 @@ const WordContentEditor: React.FC<Prop> = ({ word_head, info, onSubmit }) => {
             校验并提交
           </Button>
         </Form.Item>
-
-        <Modal
-          title="编辑词形变化"
-          visible={isTransformModalVisible}
-          onCancel={() => setTransformModalVisible(false)}
-          footer={null}
-        >
-          {/* 这里可以添加Word Transform的编辑表单 */}
-        </Modal>
       </Drawer>
+
     </Form>
   );
 };
