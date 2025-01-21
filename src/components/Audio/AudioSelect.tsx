@@ -1,7 +1,7 @@
 import PreviewModal from '@/pages/Admin/Audio/components/PreviewModal';
 import { listAudioFileByPageUsingPost } from '@/services/backend/audioFileController';
 import { Select, Button } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 
 // 新增: 使用 listAudioFileByPageUsingPost 进行远程搜索
@@ -36,13 +36,18 @@ const AudioVoiceSelect: React.FC = ({ value, onChange }: Props) => {
     setLoading(false);
   };
 
-  // 新增: 预览按钮点击事件处理
-  const handlePreview = (value: string) => {
-    // 这里可以添加预览逻辑，例如打开预览模态框或播放音频
-    console.log('Previewing:', value);
-
-    const targetRecord = options.find((option) => option.id === +value);
-  };
+  // 处理数据 把所有 UPLOADED 放到最前面
+  const processedOptions = useMemo(() => {
+    return [...options ].sort((a, b) => {
+      if (a.status === 'UPLOADED') {
+        return -1;
+      }
+      if (b.status === 'UPLOADED') {
+        return 1;
+      }
+      return 0;
+    });
+  }, [options])
 
   return (
     // 新增: 使用 div 包裹 Select 和 Button，并使用 Flexbox 布局
@@ -55,7 +60,7 @@ const AudioVoiceSelect: React.FC = ({ value, onChange }: Props) => {
         onSearch={handleSearch}
         loading={loading}
       >
-        {options.map((option) => (
+        {processedOptions.map((option) => (
           <Select.Option value={option.id} key={option.id}>
             {option.name}
             <span style={{ opacity: '0.5' }}>
