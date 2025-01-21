@@ -1,4 +1,71 @@
 declare namespace API {
+  type AudioFile = {
+    content?: string;
+    create_time?: string;
+    creator_id?: number;
+    id?: number;
+    is_delete?: number;
+    name?: string;
+    path?: string;
+    status?:
+      | 'UNKNOWN'
+      | 'UPLOADING'
+      | 'UPLOADED'
+      | 'PROCESSING'
+      | 'PROCESSED'
+      | 'FAILED'
+      | 'DELETED'
+      | 'SYNTHESIZING'
+      | 'IN_QUEUE';
+    update_time?: string;
+  };
+
+  type AudioFileAddRequest = {
+    content?: string;
+    name?: string;
+    voice?: string;
+  };
+
+  type AudioFileQueryRequest = {
+    content?: string;
+    current?: number;
+    id?: number;
+    name?: string;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+  };
+
+  type AudioFileSynthesizeRequest = {
+    id?: number;
+  };
+
+  type AudioFileVO = {
+    content?: string;
+    createTime?: string;
+    creatorId?: number;
+    id?: number;
+    name?: string;
+    status?:
+      | 'UNKNOWN'
+      | 'UPLOADING'
+      | 'UPLOADED'
+      | 'PROCESSING'
+      | 'PROCESSED'
+      | 'FAILED'
+      | 'DELETED'
+      | 'SYNTHESIZING'
+      | 'IN_QUEUE';
+    updateTime?: string;
+    userId?: number;
+  };
+
+  type BaseResponseAudioFileVO_ = {
+    code?: number;
+    data?: AudioFileVO;
+    message?: string;
+  };
+
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;
@@ -38,6 +105,18 @@ declare namespace API {
   type BaseResponseLong_ = {
     code?: number;
     data?: number;
+    message?: string;
+  };
+
+  type BaseResponsePageAudioFile_ = {
+    code?: number;
+    data?: PageAudioFile_;
+    message?: string;
+  };
+
+  type BaseResponsePageAudioFileVO_ = {
+    code?: number;
+    data?: PageAudioFileVO_;
     message?: string;
   };
 
@@ -187,7 +266,6 @@ declare namespace API {
 
   type EnglishDictionaryUpdateRequest = {
     author?: string;
-    content?: string;
     description?: string;
     id?: number;
     image_url?: string;
@@ -195,7 +273,6 @@ declare namespace API {
     name?: string;
     publication_date?: string;
     publisher?: string;
-    title?: string;
   };
 
   type EnglishDictionaryVO = {
@@ -298,6 +375,11 @@ declare namespace API {
     userId?: number;
   };
 
+  type getAudioFileVOByIdUsingGETParams = {
+    /** id */
+    id?: number;
+  };
+
   type getEnglishDictionaryVOByIdUsingGETParams = {
     /** id */
     id?: number;
@@ -341,6 +423,32 @@ declare namespace API {
   type OrderItem = {
     asc?: boolean;
     column?: string;
+  };
+
+  type PageAudioFile_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: AudioFile[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageAudioFileVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: AudioFileVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
   };
 
   type PageEnglishDictionary_ = {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, Input, Form, message } from 'antd';
 import { emptyWordPronounce, WordPronounce } from './types/WordPronounce';
+import AudioSelect from '../Audio/AudioSelect';
 
 interface WordPronounceEditorProps {
   value?: WordPronounce;
@@ -82,6 +83,13 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
               placeholder="音频描述"
               disabled={readonly} // 根据 readonly 属性设置 disabled
             />
+          </Form.Item>
+
+          <Form.Item
+            name="import"
+            label="选择已有音频"
+          >
+            <AudioSelect />
           </Form.Item>
         </Form>
       </Modal>
