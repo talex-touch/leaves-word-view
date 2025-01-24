@@ -291,13 +291,14 @@ declare namespace API {
     id?: number;
     info?: string;
     is_delete?: number;
+    status?: string;
     update_time?: string;
     word_head?: string;
   };
 
   type EnglishWordAddRequest = {
     content?: string;
-    tags?: string[];
+    status?: string;
     title?: string;
   };
 
@@ -339,7 +340,7 @@ declare namespace API {
   type EnglishWordEditRequest = {
     content?: string;
     id?: number;
-    tags?: string[];
+    status?: string;
     title?: string;
   };
 
@@ -352,7 +353,7 @@ declare namespace API {
     searchText?: string;
     sortField?: string;
     sortOrder?: string;
-    tags?: string[];
+    status?: string;
     title?: string;
     userId?: number;
   };
@@ -360,7 +361,7 @@ declare namespace API {
   type EnglishWordUpdateRequest = {
     content?: string;
     id?: number;
-    tags?: string[];
+    status?: string;
     title?: string;
   };
 
@@ -368,7 +369,7 @@ declare namespace API {
     content?: string;
     createTime?: string;
     id?: number;
-    tagList?: string[];
+    status?: string;
     title?: string;
     updateTime?: string;
     user?: UserVO;

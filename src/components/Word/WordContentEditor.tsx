@@ -32,20 +32,30 @@ const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
   const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [isAdvancedFeaturesEnabled, setAdvancedFeaturesEnabled] = useState(false);
   const [infoData, setInfoData] = useState(info || '');
-  const [parseStatus, setParseStatus] = useState<ParseStatus>(ParseStatus.NORMAL); // 新增状态来记录解析状态
+  const [parseStatus, setParseStatus] = useState<ParseStatus>(ParseStatus.NORMAL);
+  const [tipMsg, setTipMsg] = useState('');
 
   function tryParseInfo(info: string) {
-    const [parsedInfo, parseStatus] = parseWordContent(info);
+    console.error("trace")
+    const [parsedInfo, parseStatus, msg] = parseWordContent(info);
 
-    if (parsedInfo && !parseStatus) {
-      setParseStatus(ParseStatus.ERROR);
-
-      console.warn("解析失败，请检查输入格式！")
-    } else if (parsedInfo) {
+    if (parsedInfo) {
       setInfoData(JSON.stringify(parsedInfo, null, 2));
       setCurrentContent(parsedInfo);
       setParseStatus(ParseStatus.SYNCHORNISED);
+
+      return
+    }
+
+    setTipMsg('');
+    if (parsedInfo && !parseStatus) {
+      setTipMsg(msg!);
+      setParseStatus(ParseStatus.ERROR);
+
+      console.warn("解析失败，请检查输入格式！")
     } else {
+      console.log(parsedInfo)
+
       setParseStatus(ParseStatus.UNKNOWN);
     }
 
@@ -53,8 +63,8 @@ const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
   }
 
   useEffect(() => {
-    tryParseInfo(info || '')
-  }, [form, currentContent, info]);
+    setInfoData(info || '');
+  }, []);
 
   const handleSave = () => {
     form.validateFields().then(values => {
@@ -110,17 +120,11 @@ const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
   };
 
   const handleInfoChange = (newInfo: string) => {
-    if (infoData === newInfo) {
-      return;
-    }
-
     setInfoData(newInfo);
-    tryParseInfo(newInfo);
+    tryParseInfo(newInfo || '')
   }
 
   const renderStatusTip = useMemo(() => {
-    console.log("re render", parseStatus)
-
     if (parseStatus === ParseStatus.NORMAL) return null
 
     if (parseStatus === ParseStatus.SYNCHORNISED) {
@@ -142,6 +146,9 @@ const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
           setCurrentContent(parsedInfo!);
           setParseStatus(ParseStatus.SYNCHORNISED);
         }}>点击这里强行转换</Button>
+        <span>
+          {tipMsg}
+        </span>
       </span>
     }
 
@@ -151,7 +158,82 @@ const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
       </span>
     }
 
-  }, [parseStatus, currentContent, tryParseInfo])
+  }, [parseStatus])
+
+  const renderWordEditor = useMemo(() => (
+    <>
+      <Form.Item name="britishPronounce" label="英式发音" rules={[{ required: true, message: '请输入英式发音!' }]}>
+        <WordPronounceEditor value={currentContent.britishPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, britishPronounce: pronounce })} />
+      </Form.Item>
+      <Form.Item name="americanPronounce" label="美式发音" rules={[{ required: true, message: '请输入美式发音!' }]}>
+        <WordPronounceEditor value={currentContent.americanPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, americanPronounce: pronounce })} />
+      </Form.Item>
+      <Form.Item name="img" label="图片列表" rules={[{ required: true, message: '请输入图片列表!' }]}>
+        <span className='hidden'>
+          {JSON.stringify(currentContent.img)}
+        </span>
+        <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
+      </Form.Item>
+
+      <Form.Item name="translation" label="翻译" rules={[{ required: true, message: '请编辑翻译内容!' }]}>
+        <WordTranslationEditor
+          initialTranslations={currentContent.translation}
+          onSave={(updatedTranslations) => setCurrentContent({ ...currentContent, translation: updatedTranslations })}
+        />
+      </Form.Item>
+
+      <Form.Item name="examplePhrases" label="短语" rules={[{ required: true, message: '请编辑短语!' }]}>
+        <WordExampleListEditor
+          value={currentContent.examplePhrases}
+          onChange={(updatedExamplePhrased) => setCurrentContent({ ...currentContent, examplePhrases: updatedExamplePhrased })}
+        />
+      </Form.Item>
+
+      <Form.Item name="parts" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
+        <WordTransformEditor
+          initialTransforms={currentContent.transform}
+          onSave={(updatedTransforms) => setCurrentContent({ ...currentContent, transform: updatedTransforms })}
+        />
+      </Form.Item>
+
+      <Form.Item name="derived" label="单词网络" rules={[{ required: true, message: '请编辑单词网络!' }]}>
+        <WordDerivedEditor
+          initialDerivedWords={currentContent.derived}
+          onSave={(updatedDerivedWords) => setCurrentContent({ ...currentContent, derived: updatedDerivedWords })}
+        />
+      </Form.Item>
+
+      <Form.Item name="parts" label="单词组成" rules={[{ required: true, message: '请编辑单词组成!' }]}>
+        <WordAffixEditor
+          initialAffixParts={currentContent.parts}
+          onSave={(updatedAffixParts) => setCurrentContent({ ...currentContent, parts: updatedAffixParts })}
+        />
+      </Form.Item>
+
+      <Form.Item name="advancedFeatures" valuePropName="checked">
+        <Checkbox onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
+      </Form.Item>
+      {isAdvancedFeaturesEnabled && (
+        <>
+          <Form.Item name="remember" label="记忆方法">
+            <Input.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item name="story" label="故事">
+            <Input.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item name="backgroundStory" label="背景故事">
+            <Input.TextArea rows={4} />
+          </Form.Item>
+        </>
+      )}
+
+      <Form.Item>
+        <Button type="primary" onClick={handleSave}>
+          校验并提交
+        </Button>
+      </Form.Item>
+    </>
+  ), [currentContent, isAdvancedFeaturesEnabled, infoData, handleSave, handleInfoChange, setAdvancedFeaturesEnabled, setCurrentContent, setInfoData, setDrawerVisible, setParseStatus, setTipMsg, tipMsg, parseStatus, parseWordContent, parseStatus])
 
   return (
     <Form form={form} layout="vertical">
@@ -173,73 +255,7 @@ const WordContentEditor: React.FC<Prop> = ({ info, onSubmit }) => {
         onClose={() => setDrawerVisible(false)}
         open={isDrawerVisible}
       >
-        <Form.Item name="britishPronounce" label="英式发音" rules={[{ required: true, message: '请输入英式发音!' }]}>
-          <WordPronounceEditor value={currentContent.britishPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, britishPronounce: pronounce })} />
-        </Form.Item>
-        <Form.Item name="americanPronounce" label="美式发音" rules={[{ required: true, message: '请输入美式发音!' }]}>
-          <WordPronounceEditor value={currentContent.americanPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, americanPronounce: pronounce })} />
-        </Form.Item>
-        <Form.Item name="img" label="图片列表" rules={[{ required: true, message: '请输入图片列表!' }]}>
-          <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
-        </Form.Item>
-
-        <Form.Item name="translation" label="翻译" rules={[{ required: true, message: '请编辑翻译内容!' }]}>
-          <WordTranslationEditor
-            initialTranslations={currentContent.translation}
-            onSave={(updatedTranslations) => setCurrentContent({ ...currentContent, translation: updatedTranslations })}
-          />
-        </Form.Item>
-
-        <Form.Item name="examplePhrases" label="短语" rules={[{ required: true, message: '请编辑短语!' }]}>
-          <WordExampleListEditor
-            value={currentContent.examplePhrases}
-            onChange={(updatedExamplePhrased) => setCurrentContent({ ...currentContent, examplePhrases: updatedExamplePhrased })}
-          />
-        </Form.Item>
-
-        <Form.Item name="parts" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
-          <WordTransformEditor
-            initialTransforms={currentContent.transform}
-            onSave={(updatedTransforms) => setCurrentContent({ ...currentContent, transform: updatedTransforms })}
-          />
-        </Form.Item>
-
-        <Form.Item name="derived" label="单词网络" rules={[{ required: true, message: '请编辑单词网络!' }]}>
-          <WordDerivedEditor
-            initialDerivedWords={currentContent.derived}
-            onSave={(updatedDerivedWords) => setCurrentContent({ ...currentContent, derived: updatedDerivedWords })}
-          />
-        </Form.Item>
-
-        <Form.Item name="parts" label="单词组成" rules={[{ required: true, message: '请编辑单词组成!' }]}>
-          <WordAffixEditor
-            initialAffixParts={currentContent.parts}
-            onSave={(updatedAffixParts) => setCurrentContent({ ...currentContent, parts: updatedAffixParts })}
-          />
-        </Form.Item>
-
-        <Form.Item name="advancedFeatures" valuePropName="checked">
-          <Checkbox onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
-        </Form.Item>
-        {isAdvancedFeaturesEnabled && (
-          <>
-            <Form.Item name="remember" label="记忆方法">
-              <Input.TextArea rows={4} />
-            </Form.Item>
-            <Form.Item name="story" label="故事">
-              <Input.TextArea rows={4} />
-            </Form.Item>
-            <Form.Item name="backgroundStory" label="背景故事">
-              <Input.TextArea rows={4} />
-            </Form.Item>
-          </>
-        )}
-
-        <Form.Item>
-          <Button type="primary" onClick={handleSave}>
-            校验并提交
-          </Button>
-        </Form.Item>
+        {renderWordEditor}
       </Drawer>
 
     </Form>

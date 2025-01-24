@@ -143,7 +143,14 @@ export default defineConfig({
   requestRecord: {},
   chainWebpack: (config, { webpack }) => {
     config.plugin('monaco-editor').use(MonacoWebpackPlugin)
-  }
+  },
+  plugins: [
+    require.resolve('@umijs/plugins/dist/unocss')
+  ],
+  unocss: {
+    // 检测 className 的文件范围，若项目不包含 src 目录，可使用 `pages/**/*.tsx`
+    watch: ['src/**/*.tsx']
+  },
   // plugins: [
   //   new MonacoWebpackPlugin({
   //     languages: ['javascript', 'typescript', 'css', 'html', 'json'],

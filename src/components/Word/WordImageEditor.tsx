@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { EditableProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 
@@ -7,9 +7,19 @@ interface WordImageEditorProps {
   onChange: (translations: string[]) => void;
 }
 
+type Image = {
+  id: number;
+  url: string;
+}
+
 const WordImageEditor: React.FC<WordImageEditorProps> = ({ value, onChange }) => {
-  const [imageList, setImageList] = useState([...value].map((url, index) => ({ id: index, url })));
+  const [imageList, setImageList] = useState<Image[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
+
+  useEffect(() => {
+    if (!value) return
+    setImageList([...value].map((url, index) => ({ id: index, url })));
+  }, [value])
 
   const columns: ProColumns<{ id: number; url: string }>[] = [
     {
