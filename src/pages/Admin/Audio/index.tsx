@@ -70,7 +70,7 @@ const AudioAdminPage: React.FC = () => {
   };
 
   /**
- * 启动合成
+ * 上传音频
  * @param fields
  */
   const handleUpload = async (fields: API.AudioFile) => {

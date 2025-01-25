@@ -1,13 +1,13 @@
-import { ProColumns, ProTable } from '@ant-design/pro-components';
+import WordContentEditor from '@/components/Word/WordContentEditor';
 import '@umijs/max';
-import { Drawer, message } from 'antd';
-import React from 'react';
+import { Button, Drawer, Form, Input, message, type FormProps } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 type Request = API.EnglishWordAddRequest | API.EnglishWordUpdateRequest
 
 interface Props {
   visible: boolean;
-  columns: ProColumns<API.EnglishDictionary>[];
+  oldData?: API.EnglishWord;
   onSubmit: (values: Request) => Promise<boolean>;
   onCancel: () => void;
 }
@@ -37,12 +37,29 @@ const handleSubmit = async (fields: Request, props: Props) => { // 修改: API.U
  * @constructor
  */
 const InnerModal: React.FC<Props> = (props) => {
-  const { visible, columns, onCancel } = props;
+  const { visible, oldData, onCancel } = props;
+
+
+  const [word, setWord] = useState("")
+  // const [info, setInfo] = useState("")
+
+  const onFinish: FormProps<Request>['onFinish'] = (values) => {
+    console.log('Success:', values);
+    handleSubmit(values, props)
+  };
+
+  const onFinishFailed: FormProps<Request>['onFinishFailed'] = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  useEffect(() => {
+    setWord(oldData?.word_head || "")
+  }, [])
 
   return (
     <Drawer // 修改: 将 Modal 替换为 Drawer
       destroyOnClose
-      title={'提交'}
+      title={oldData ? '编辑提交' : '新增提交'}
       placement="right" // 添加: 设置 Drawer 从右侧弹出
       width="85%" // 修改: 设置 Drawer 宽度为屏幕的 85%
       onClose={() => {
@@ -50,11 +67,53 @@ const InnerModal: React.FC<Props> = (props) => {
       }}
       open={visible}
     >
-      <ProTable
+      <Form
+        name="word"
+        initialValues={oldData}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
+      >
+        <Form.Item<Request>
+          label="单词"
+          name="word_head"
+          rules={[{ required: true, message: '请输入单词' }]}
+        >
+          <Input value={word} onChange={(e) => setWord(e.target.value)}></Input>
+        </Form.Item>
+
+        {oldData?.id &&
+          <Form.Item<Request>
+            label="信息"
+            name="info"
+            rules={[{ required: true, message: '请输入信息' }]}
+          >
+            <WordContentEditor editable data={oldData} />
+          </Form.Item>
+        }
+        <Form.Item label={null}>
+          <Button type="primary" htmlType="submit">
+            提交
+          </Button>
+        </Form.Item>
+      </Form>
+
+      {/* 
+
+      <Button htmlType='submit' onClick={async () => {
+        const success = await handleAdd({
+          word
+        });
+        if (success) {
+          onSubmit?.(values);
+        }
+      }} type="primary">提交</Button> */}
+      {/* <ProTable
         type="form"
-        columns={columns}
         onSubmit={(request: Request) => handleSubmit(request, props)}
-      />
+      >
+
+      </ProTable> */}
     </Drawer>
   );
 };

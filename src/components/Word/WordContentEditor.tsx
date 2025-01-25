@@ -7,12 +7,13 @@ import WordTranslationEditor from './WordTranslationEditor';
 import { emptyWordContent, parseWordContent } from './types/WordContent';
 import { isValidPronounce, isValidTranslationList, isValidWordAffixPartList, isValidWordDerivedList, isValidWordTransformList, WordExampleTypeEnum } from './types';
 import WordDerivedEditor from './WordDerivedEditor';
-import WordImageEditor from './WordImageEditor';
+import WordImageEditor, { WordImageCreator } from './WordImageEditor';
 import WordAffixEditor from './WordAffixEditor';
 import WordTransformEditor from './WordTransformEditor';
 import WordExampleListEditor from './WordExampleListEditor';
 
 export type Prop = {
+  data: API.EnglishWord;
   value?: string | null;
   editable?: boolean;
   onChange?: (wordContent: string) => void;
@@ -25,7 +26,7 @@ enum ParseStatus {
   SYNCHORNISED = 2
 }
 
-const WordContentEditor: React.FC<Prop> = ({ value, editable, onChange }) => {
+const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) => {
   const [form] = Form.useForm();
   const [currentContent, setCurrentContent] = useState(emptyWordContent());
   const [isDrawerVisible, setDrawerVisible] = useState(false);
@@ -56,7 +57,7 @@ const WordContentEditor: React.FC<Prop> = ({ value, editable, onChange }) => {
 
       console.warn("解析失败，请检查输入格式！")
     } else {
-      console.log(parsedInfo)
+      console.warn(parsedInfo)
 
       setParseStatus(ParseStatus.UNKNOWN);
     }
@@ -202,12 +203,15 @@ const WordContentEditor: React.FC<Prop> = ({ value, editable, onChange }) => {
             label: '图片列表',
             key: '2',
             children: (
-              <Form.Item name="img" label="图片列表" rules={[{ required: true, message: '请输入图片列表!' }]}>
-                <span className='hidden'>
-                  {JSON.stringify(currentContent.img)}
-                </span>
-                <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
-              </Form.Item>
+              <>
+                <Form.Item name="img" label="图片列表" rules={[{ required: true, message: '请输入图片列表!' }]}>
+                  <span className='hidden'>
+                    {JSON.stringify(currentContent.img)}
+                  </span>
+                  <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
+                </Form.Item>
+                {data?.id && <WordImageCreator wordId={data.id!} onSubmit={(img) => setCurrentContent({ ...currentContent, img: [...currentContent.img, img] })} />}
+              </>
             ),
           },
           {
@@ -302,11 +306,11 @@ const WordContentEditor: React.FC<Prop> = ({ value, editable, onChange }) => {
             校验并提交
           </Button>
         ) : (
-            <>
-              <Button variant='filled' color='volcano' onClick={handleSave}>
-                提交审阅
-              </Button>
-            </>
+          <>
+            <Button variant='filled' color='volcano' onClick={handleSave}>
+              提交审阅
+            </Button>
+          </>
         )}
       </div>
     </>
@@ -316,13 +320,12 @@ const WordContentEditor: React.FC<Prop> = ({ value, editable, onChange }) => {
     <Form form={form} layout="vertical">
       {editable ? (
         <>
-          <Form.Item label="">
-            <InfoComponent onChange={handleInfoChange} data={infoData} />
+          <InfoComponent onChange={handleInfoChange} data={infoData} />
 
-            <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>
-              {renderStatusTip}
-            </div>
-          </Form.Item>
+          <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>
+            {renderStatusTip}
+          </div>
+
           <Button type="dashed" onClick={() => setDrawerVisible(true)}>
             进入单词编辑器
           </Button>

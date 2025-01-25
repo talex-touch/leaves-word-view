@@ -3,6 +3,7 @@ import { ProColumns } from '@ant-design/pro-components';
 import '@umijs/max';
 import React from 'react';
 import InnerModal from './InnerModal';
+import '@umijs/max';
 
 interface Props {
   visible: boolean;
@@ -17,18 +18,16 @@ interface Props {
  * @constructor
  */
 const CreateModal: React.FC<Props> = (props) => {
-  const { visible, columns, onSubmit, onCancel } = props;
+  const { visible, onSubmit, onCancel } = props;
 
   return (
+
     <InnerModal
       visible={visible}
-      columns={columns}
       onCancel={() => {
         onCancel?.();
       }}
-      onSubmit={async (values) => { 
-        console.log({ values })
-
+      onSubmit={async (values) => {
         const success = await addEnglishWordUsingPost(values);
         if (success) {
           onSubmit?.(values);
@@ -43,3 +42,5 @@ const CreateModal: React.FC<Props> = (props) => {
 };
 
 export default CreateModal;
+
+

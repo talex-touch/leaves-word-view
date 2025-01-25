@@ -32,6 +32,11 @@ export const requestConfig: RequestConfig = {
   // 响应拦截器
   responseInterceptors: [
     (response) => {
+      // 如果响应的 Content-Type 是 txt/event-stream 不做处理
+      if (response.headers['content-type'] === 'text/event-stream') {
+        return response;
+      }
+
       // 请求地址
       const requestPath: string = response.config.url ?? '';
 

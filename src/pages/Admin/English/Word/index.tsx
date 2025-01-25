@@ -131,12 +131,12 @@ const EnglishWordPage: React.FC = () => {
       title: '信息',
       dataIndex: 'info',
       hideInSearch: true,
-      render: (value/* , _data, _row, _action */) => {
-        return <WordContentEditor value={value as any} />;
+      render: (value, data/* , _data, _row, _action */) => {
+        return <WordContentEditor word={data.word_head!} value={value as any} />;
       },
-      renderFormItem: () => {
-        return <WordContentEditor editable />;
-      },
+      // renderFormItem: () => {
+      //   return <WordContentEditor editable />;
+      // },
     },
     {
       title: '操作',

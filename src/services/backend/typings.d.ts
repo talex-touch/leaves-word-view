@@ -369,10 +369,9 @@ declare namespace API {
   };
 
   type EnglishWordUpdateRequest = {
-    content?: string;
     id?: number;
-    status?: string;
-    title?: string;
+    info?: string;
+    word_head?: string;
   };
 
   type EnglishWordVO = {

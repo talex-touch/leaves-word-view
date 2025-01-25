@@ -91,8 +91,6 @@ export function parseWordContent(text: string): [WordContent | null, boolean, st
     // 检查解析后的数据是否符合 WordContent 的结构
 
     for (const key of Object.keys(parsedData)) {
-      // console.log("validate ", key)
-      // if ( !parsedData.hasOwnProperty(key) ) continue
       const checker = typeCheckMapper[key];
 
       if (!checker) {

@@ -19,6 +19,7 @@ export default [
       { icon: 'table', path: '/admin/english/dictionary', component: './Admin/English/Dictionary', name: '词典管理' },
       { icon: 'table', path: '/admin/english/word', component: './Admin/English/Word', name: '单词管理' },
       { icon: 'table', path: '/admin/audio', component: './Admin/Audio', name: '音频管理' },
+      { icon: 'table', path: '/admin/media-creator', component: './Admin/MediaCreator', name: 'AI媒体创作中心' },
     ],
   },
   { path: '/', redirect: '/welcome' },

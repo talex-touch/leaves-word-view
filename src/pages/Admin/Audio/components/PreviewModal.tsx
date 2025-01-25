@@ -12,7 +12,7 @@ interface Props {
  * @param props
  * @constructor
  */
-const UpdateModal: React.FC<Props> = (props) => {
+const PreviewModal: React.FC<Props> = (props) => {
   const { data } = props;
   const [objData, setObjData] = useState<any>({})
   // 是否显示预览
@@ -22,7 +22,6 @@ const UpdateModal: React.FC<Props> = (props) => {
     if (!data?.content) return
 
     const content = Base64.decode(data.content as string)
-    console.log({ content, data })
     const obj = JSON.parse(content)
 
     setObjData(obj);
@@ -95,4 +94,4 @@ const UpdateModal: React.FC<Props> = (props) => {
     </>
   );
 };
-export default UpdateModal;
+export default PreviewModal;

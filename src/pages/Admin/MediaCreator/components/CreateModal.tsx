@@ -1,4 +1,4 @@
-import { addAudioFileUsingPost } from '@/services/backend/audioFileController';
+import { addMediaCreatorUsingPost } from '@/services/backend/mediaCreatorController';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { message, Modal } from 'antd';
@@ -6,8 +6,8 @@ import React from 'react';
 
 interface Props {
   visible: boolean;
-  columns: ProColumns<API.AudioFile>[];
-  onSubmit: (values: API.AudioFileAddRequest) => void;
+  columns: ProColumns<API.MediaCreator>[];
+  onSubmit: (values: API.MediaCreatorAddRequest) => void;
   onCancel: () => void;
 }
 
@@ -15,10 +15,10 @@ interface Props {
  * 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.AudioFile) => {
+const handleAdd = async (fields: API.MediaCreatorAddRequest) => {
   const hide = message.loading('正在添加');
   try {
-    await addAudioFileUsingPost(fields);
+    await addMediaCreatorUsingPost(fields);
     hide();
     message.success('创建成功');
     return true;
@@ -50,7 +50,7 @@ const CreateModal: React.FC<Props> = (props) => {
       <ProTable
         type="form"
         columns={columns}
-        onSubmit={async (values: API.AudioFileAddRequest) => {
+        onSubmit={async (values: API.MediaCreatorAddRequest) => {
           const success = await handleAdd(values);
           if (success) {
             onSubmit?.(values);
