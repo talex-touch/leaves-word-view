@@ -2,12 +2,14 @@ import WordContentEditor from '@/components/Word/WordContentEditor';
 import CreateModal from '@/pages/Admin/English/Word/components/CreateModal';
 import UpdateModal from '@/pages/Admin/English/Word/components/UpdateModal';
 import { deleteEnglishWordUsingPost, listEnglishWordByPageUsingPost } from '@/services/backend/englishWordController';
-import { PlusOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { Button, message, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
+import { Tag } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, CloudUploadOutlined, FileOutlined, LoadingOutlined, MinusCircleOutlined, QuestionCircleOutlined, SyncOutlined, UploadOutlined } from '@ant-design/icons';
 
 /**
  * 英语词典管理页面
@@ -65,15 +67,75 @@ const EnglishWordPage: React.FC = () => {
       },
     },
     {
+      title: '状态',
+      dataIndex: 'status',
+      hideInForm: true,
+      valueEnum: {
+        UNKNOWN: {
+          text: <Tag icon={<QuestionCircleOutlined />} color="default">未知</Tag>,
+        },
+        CREATED: {
+          text: <Tag icon={<MinusCircleOutlined />} color="default">已创建</Tag>,
+        },
+        UPLOADING: {
+          text: <Tag icon={<LoadingOutlined />} color="blue">上传中</Tag>,
+        },
+        UPLOADED: {
+          text: <Tag icon={<CloudUploadOutlined />} color="green">已上传</Tag>,
+        },
+        IMPORTING: {
+          text: <Tag icon={<SyncOutlined />} color="blue">导入中</Tag>,
+        },
+        EXPORTING: {
+          text: <Tag icon={<SyncOutlined />} color="blue">导出中</Tag>,
+        },
+        EXPORTED: {
+          text: <Tag icon={<FileOutlined />} color="green">已导出</Tag>,
+        },
+        PROCESSING: {
+          text: <Tag icon={<SyncOutlined />} color="blue">处理中</Tag>,
+        },
+        PROCESSED: {
+          text: <Tag icon={<CheckCircleOutlined />} color="green">已处理</Tag>,
+        },
+        REVIEWING: {
+          text: <Tag icon={<SyncOutlined />} color="blue">审核中</Tag>,
+        },
+        APPROVED: {
+          text: <Tag icon={<CheckCircleOutlined />} color="green">已审核通过</Tag>,
+        },
+        REJECTED: {
+          text: <Tag icon={<CloseCircleOutlined />} color="red">被驳回</Tag>,
+        },
+        FAILED: {
+          text: <Tag icon={<CloseCircleOutlined />} color="red">失败</Tag>,
+        },
+        DATA_FORMAT_ERROR: {
+          text: <Tag icon={<ExclamationCircleOutlined />} color="red">数据格式校验不通过</Tag>,
+        },
+        DELETED: {
+          text: <Tag icon={<MinusCircleOutlined />} color="default">已删除</Tag>,
+        },
+        IN_QUEUE: {
+          text: <Tag icon={<ClockCircleOutlined />} color="default">队列中</Tag>,
+        },
+        PUBLISHED: {
+          text: <Tag icon={<CheckCircleOutlined />} color="green">已发布</Tag>,
+        },
+        UNPUBLISHED: {
+          text: <Tag icon={<CloseCircleOutlined />} color="red">未发布</Tag>,
+        },
+      },
+    },
+    {
       title: '信息',
       dataIndex: 'info',
       hideInSearch: true,
-      // valueType: '',
-      render: (_, record) => {
-        return <WordContentEditor word_head={record.word_head} info={record.info} />;
+      render: (value/* , _data, _row, _action */) => {
+        return <WordContentEditor value={value as any} />;
       },
-      renderFormItem: (_, record) => {
-        return <WordContentEditor editable word_head={record.record?.word_head} info={record.record?.info} />;
+      renderFormItem: () => {
+        return <WordContentEditor editable />;
       },
     },
     {

@@ -76,7 +76,7 @@ const UserRegisterPage: React.FC = () => {
           }}
           logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
           title="千叶单词 - 注册"
-          subTitle={'LeaveWord ManageSystem'}
+          subTitle={'LeavesWord ManageSystem'}
           initialValues={{
             autoLogin: true,
           }}

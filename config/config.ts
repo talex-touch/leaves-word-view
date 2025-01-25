@@ -77,7 +77,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: '千叶单词 LeaveWord',
+  title: '千叶单词 LeavesWord',
   layout: {
     locale: true,
     ...defaultSettings,

@@ -4,10 +4,11 @@ import './info-style.css'
 
 interface InfoComponentProps {
   data: string;
+  readonly?: boolean;
   onChange?: (newValue: string) => void;
 }
 
-const InfoComponent: React.FC<InfoComponentProps> = ({ data, onChange }) => {
+const InfoComponent: React.FC<InfoComponentProps> = ({ data, readonly, onChange }) => {
   const [code, setCode] = useState(data);
 
   const editorDidMount: EditorDidMount = (editor) => {
@@ -20,6 +21,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ data, onChange }) => {
   };
 
   const options = {
+    readOnly: readonly ?? false,
     formatOnPaste: true,
     formatOnType: true,
     selectOnLineNumbers: true

@@ -37,6 +37,8 @@ const handleAdd = async (fields: API.AudioFile) => {
 const CreateModal: React.FC<Props> = (props) => {
   const { visible, columns, onSubmit, onCancel } = props;
 
+  console.log("cm", props)
+
   return (
     <Modal
       destroyOnClose

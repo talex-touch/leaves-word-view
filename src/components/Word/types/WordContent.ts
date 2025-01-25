@@ -68,25 +68,25 @@ export function parseWordContent(text: string): [WordContent | null, boolean, st
   try {
     const parsedData = JSON.parse(text);
 
-    const targetContent: WordContent = {
-      id: parsedData.id,
-      title: parsedData.title,
-      content: parsedData.content,
-      author: parsedData.author,
-      createdAt: new Date(parsedData.createdAt),
-      britishPronounce: parsedData.britishPronounce,
-      americanPronounce: parsedData.americanPronounce,
-      derived: parsedData.derived,
-      img: parsedData.img,
-      // thumbnail: parsedData.thumbnail,
-      remember: parsedData.remember,
-      story: parsedData.story,
-      transform: parsedData.transform,
-      translation: parsedData.translation,
-      examplePhrases: parsedData.examplePhrases,
-      parts: parsedData.parts,
-      backgroundStory: parsedData.backgroundStory,
-    }
+    // const targetContent: WordContent = {
+    //   id: parsedData.id,
+    //   title: parsedData.title,
+    //   content: parsedData.content,
+    //   author: parsedData.author,
+    //   createdAt: new Date(parsedData.createdAt),
+    //   britishPronounce: parsedData.britishPronounce,
+    //   americanPronounce: parsedData.americanPronounce,
+    //   derived: parsedData.derived,
+    //   img: parsedData.img,
+    //   // thumbnail: parsedData.thumbnail,
+    //   remember: parsedData.remember,
+    //   story: parsedData.story,
+    //   transform: parsedData.transform,
+    //   translation: parsedData.translation,
+    //   examplePhrases: parsedData.examplePhrases,
+    //   parts: parsedData.parts,
+    //   backgroundStory: parsedData.backgroundStory,
+    // }
 
     // 检查解析后的数据是否符合 WordContent 的结构
 
@@ -104,10 +104,6 @@ export function parseWordContent(text: string): [WordContent | null, boolean, st
       }
 
     }
-
-    console.log({
-      parsedData
-    })
 
     return [parsedData, true, undefined];
 

@@ -7,7 +7,7 @@ import InnerModal from './InnerModal';
 interface Props {
   visible: boolean;
   columns: ProColumns<API.EnglishWord>[];
-  onSubmit: (values: API.EnglishWordAddRequest) => void; // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
+  onSubmit: (values: API.EnglishWordAddRequest) => void;
   onCancel: () => void;
 }
 
@@ -26,7 +26,9 @@ const CreateModal: React.FC<Props> = (props) => {
       onCancel={() => {
         onCancel?.();
       }}
-      onSubmit={async (values) => { // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
+      onSubmit={async (values) => { 
+        console.log({ values })
+
         const success = await addEnglishWordUsingPost(values);
         if (success) {
           onSubmit?.(values);

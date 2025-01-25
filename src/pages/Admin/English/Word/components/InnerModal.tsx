@@ -17,6 +17,7 @@ interface Props {
  * @param fields
  */
 const handleSubmit = async (fields: Request, props: Props) => { // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
+  console.log({ fields })
   const hide = message.loading('正在提交');
   try {
     await props.onSubmit(fields); // 修改: addUserUsingPost -> addEnglishDictionaryUsingPost

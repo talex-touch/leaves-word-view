@@ -108,6 +108,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseMediaCreatorVO_ = {
+    code?: number;
+    data?: MediaCreatorVO;
+    message?: string;
+  };
+
   type BaseResponsePageAudioFile_ = {
     code?: number;
     data?: PageAudioFile_;
@@ -153,6 +159,18 @@ declare namespace API {
   type BaseResponsePageEnglishWordVO_ = {
     code?: number;
     data?: PageEnglishWordVO_;
+    message?: string;
+  };
+
+  type BaseResponsePageMediaCreator_ = {
+    code?: number;
+    data?: PageMediaCreator_;
+    message?: string;
+  };
+
+  type BaseResponsePageMediaCreatorVO_ = {
+    code?: number;
+    data?: PageMediaCreatorVO_;
     message?: string;
   };
 
@@ -297,9 +315,8 @@ declare namespace API {
   };
 
   type EnglishWordAddRequest = {
-    content?: string;
-    status?: string;
-    title?: string;
+    info?: string;
+    word_head?: string;
   };
 
   type EnglishWordChangeLog = {
@@ -335,13 +352,6 @@ declare namespace API {
     updateTime?: string;
     user?: UserVO;
     userId?: number;
-  };
-
-  type EnglishWordEditRequest = {
-    content?: string;
-    id?: number;
-    status?: string;
-    title?: string;
   };
 
   type EnglishWordQueryRequest = {
@@ -396,6 +406,11 @@ declare namespace API {
     id?: number;
   };
 
+  type getMediaCreatorVOByIdUsingGETParams = {
+    /** id */
+    id?: number;
+  };
+
   type getPostVOByIdUsingGETParams = {
     /** id */
     id?: number;
@@ -419,6 +434,44 @@ declare namespace API {
     userName?: string;
     userProfile?: string;
     userRole?: string;
+  };
+
+  type MediaCreator = {
+    created_at?: string;
+    creator_id?: number;
+    id?: number;
+    info?: string;
+    media_type?: string;
+    media_url?: string;
+    word_id?: number;
+  };
+
+  type MediaCreatorAddRequest = {
+    mediaType?: 'LIVE' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'STATIC_VIDEO';
+    wordId?: number;
+  };
+
+  type MediaCreatorQueryRequest = {
+    current?: number;
+    id?: number;
+    mediaType?: string;
+    notId?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    userId?: number;
+    wordId?: number;
+  };
+
+  type MediaCreatorVO = {
+    createdAt?: string;
+    creatorId?: number;
+    id?: number;
+    info?: string;
+    mediaType?: string;
+    mediaUrl?: string;
+    user?: UserVO;
+    wordId?: number;
   };
 
   type OrderItem = {
@@ -525,6 +578,32 @@ declare namespace API {
     orders?: OrderItem[];
     pages?: number;
     records?: EnglishWordVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageMediaCreator_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: MediaCreator[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageMediaCreatorVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: MediaCreatorVO[];
     searchCount?: boolean;
     size?: number;
     total?: number;
@@ -661,6 +740,10 @@ declare namespace API {
     updateTime?: string;
     user?: UserVO;
     userId?: number;
+  };
+
+  type SseEmitter = {
+    timeout?: number;
   };
 
   type uploadFileUsingPOSTParams = {

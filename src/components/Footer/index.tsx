@@ -29,10 +29,10 @@ const Footer: React.FC = () => {
           key: 'github',
           title: (
             <>
-              <GithubOutlined /> LeaveWord
+              <GithubOutlined /> LeavesWord
             </>
           ),
-          href: 'https://github.com/LeaveWord',
+          href: 'https://github.com/LeavesWord',
           blankTarget: true,
         },
       ]}

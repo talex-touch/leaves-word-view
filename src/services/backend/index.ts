@@ -8,6 +8,7 @@ import * as englishDictionaryController from './englishDictionaryController';
 import * as englishWordController from './englishWordController';
 import * as englishWordChangeLogController from './englishWordChangeLogController';
 import * as fileController from './fileController';
+import * as mediaCreatorController from './mediaCreatorController';
 import * as postController from './postController';
 import * as postFavourController from './postFavourController';
 import * as postThumbController from './postThumbController';
@@ -19,6 +20,7 @@ export default {
   englishWordController,
   englishWordChangeLogController,
   fileController,
+  mediaCreatorController,
   postController,
   postFavourController,
   postThumbController,

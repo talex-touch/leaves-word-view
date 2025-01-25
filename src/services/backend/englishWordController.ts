@@ -32,21 +32,6 @@ export async function deleteEnglishWordUsingPost(
   });
 }
 
-/** editEnglishWord POST /api/english_word/edit */
-export async function editEnglishWordUsingPost(
-  body: API.EnglishWordEditRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponseBoolean_>('/api/english_word/edit', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** getEnglishWordVOById GET /api/english_word/get/vo */
 export async function getEnglishWordVoByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
