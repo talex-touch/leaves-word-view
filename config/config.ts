@@ -154,7 +154,11 @@ export default defineConfig({
   exportStatic: {
     extraRoutePaths: ['/']
   },
-  esbuildMinifyIIFE: true
+  // manifest: {
+  //   basePath: '/',
+  //   fileName: 'manifest.json',
+  // },
+  esbuildMinifyIIFE: true,
   // plugins: [
   //   new MonacoWebpackPlugin({
   //     languages: ['javascript', 'typescript', 'css', 'html', 'json'],
