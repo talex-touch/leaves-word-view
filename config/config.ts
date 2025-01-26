@@ -151,7 +151,10 @@ export default defineConfig({
     // 检测 className 的文件范围，若项目不包含 src 目录，可使用 `pages/**/*.tsx`
     watch: ['src/**/*.tsx']
   },
-  publicPath: './'
+  exportStatic: {
+    extraRoutePaths: ['/']
+  },
+  esbuildMinifyIIFE: true
   // plugins: [
   //   new MonacoWebpackPlugin({
   //     languages: ['javascript', 'typescript', 'css', 'html', 'json'],
