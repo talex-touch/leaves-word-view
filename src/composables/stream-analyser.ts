@@ -46,3 +46,48 @@ export function parseSSEData(data: string): any[] {
   // }).filter(eventData => eventData !== null);
 }
 
+export async function fetchSSEData(url: string): Promise<void> {
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch SSE data: ${response.statusText}`);
+  }
+
+  const reader = response.body?.getReader();
+  const decoder = new TextDecoder();
+
+  if (!reader) {
+    throw new Error('Failed to get response body reader');
+  }
+
+  try {
+    for await (const chunk of reader) {
+      const data = decoder.decode(chunk, { stream: true });
+      const lines = data.split('\n\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data:')) {
+          const eventData = line.substring(5);
+          try {
+            const obj = JSON.parse(eventData);
+            console.log({ obj });
+            // 在这里可以处理解析后的对象
+          } catch (e) {
+            console.error('Failed to parse JSON:', e);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error reading stream:', error);
+  } finally {
+    reader.releaseLock();
+  }
+}
