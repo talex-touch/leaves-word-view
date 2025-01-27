@@ -2,11 +2,7 @@ import { WordAffixPart, WordDerived, WordExample, WordPronounce, WordTransform, 
 import { emptyWordPronounce } from './WordPronounce';
 
 export interface WordContent {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  createdAt: Date;
+  id?: number;
   britishPronounce: WordPronounce;
   americanPronounce: WordPronounce;
   derived: WordDerived[];
@@ -24,10 +20,6 @@ export interface WordContent {
 export function emptyWordContent(): WordContent {
   return {
     id: 0,
-    title: '',
-    content: '',
-    author: '',
-    createdAt: new Date(),
     britishPronounce: emptyWordPronounce(),
     americanPronounce: emptyWordPronounce(),
     derived: [],
@@ -133,3 +125,14 @@ export function parseWordContent(text: string): [WordContent | null, boolean, st
   }
 }
 
+export function parseDictWord(obj: any) {
+  const { wordRank, headWord, content, bookId } = obj
+  if ( !wordRank || !headWord || !content || !bookId) 
+    throw new Error('Invalid object')
+
+  const wordContent: WordContent = emptyWordContent()
+
+  // TODO
+
+  return wordContent
+}

@@ -17,6 +17,21 @@ export async function addEnglishWordUsingPost(
   });
 }
 
+/** addEnglishWordBatch POST /api/english_word/add/batch */
+export async function addEnglishWordBatchUsingPost(
+  body: API.EnglishWordAddBatchRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseArrayInt_>('/api/english_word/add/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** deleteEnglishWord POST /api/english_word/delete */
 export async function deleteEnglishWordUsingPost(
   body: API.DeleteRequest,

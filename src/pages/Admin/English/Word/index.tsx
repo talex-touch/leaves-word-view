@@ -2,14 +2,15 @@ import WordContentEditor from '@/components/Word/WordContentEditor';
 import CreateModal from '@/pages/Admin/English/Word/components/CreateModal';
 import UpdateModal from '@/pages/Admin/English/Word/components/UpdateModal';
 import { deleteEnglishWordUsingPost, listEnglishWordByPageUsingPost } from '@/services/backend/englishWordController';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Space, Typography } from 'antd';
+import { Button, message, Modal, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { Tag } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, CloudUploadOutlined, FileOutlined, LoadingOutlined, MinusCircleOutlined, QuestionCircleOutlined, SyncOutlined, UploadOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, CloudUploadOutlined, FileOutlined, LoadingOutlined, MinusCircleOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import BatchImporter from '@/components/Word/BatchImporter';
 
 /**
  * 英语词典管理页面
@@ -21,6 +22,8 @@ const EnglishWordPage: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+  // 是否显示批量导入窗口
+  const [batchImportModalVisible, setBatchImportModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   // 当前用户点击的数据
   const [currentRow, setCurrentRow] = useState<API.EnglishWord>();
@@ -132,7 +135,7 @@ const EnglishWordPage: React.FC = () => {
       dataIndex: 'info',
       hideInSearch: true,
       render: (value, data/* , _data, _row, _action */) => {
-        return <WordContentEditor word={data.word_head!} value={value as any} />;
+        return <WordContentEditor data={data} value={value as any} />;
       },
       // renderFormItem: () => {
       //   return <WordContentEditor editable />;
@@ -169,6 +172,16 @@ const EnglishWordPage: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
+          <Button
+            variant="dashed"
+            color="geekblue"
+            key="primary"
+            onClick={() => {
+              setBatchImportModalVisible(true);
+            }}
+          >
+            <ImportOutlined /> 批量导入
+          </Button>,
           <Button
             type="primary"
             key="primary"
@@ -222,6 +235,20 @@ const EnglishWordPage: React.FC = () => {
           setUpdateModalVisible(false);
         }}
       />
+      <Modal
+        title="批量导入"
+        open={batchImportModalVisible}
+        footer={null}
+        onCancel={() => {
+          setBatchImportModalVisible(false);
+        }}
+      >
+        <BatchImporter onDone={() => {
+          setBatchImportModalVisible(false);
+
+          actionRef.current?.reload();
+        }} />
+      </Modal>
     </PageContainer>
   );
 };

@@ -60,6 +60,12 @@ declare namespace API {
     userId?: number;
   };
 
+  type BaseResponseArrayInt_ = {
+    code?: number;
+    data?: number[];
+    message?: string;
+  };
+
   type BaseResponseAudioFileVO_ = {
     code?: number;
     data?: AudioFileVO;
@@ -69,6 +75,12 @@ declare namespace API {
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;
+    message?: string;
+  };
+
+  type BaseResponseDictionaryWordVO_ = {
+    code?: number;
+    data?: DictionaryWordVO;
     message?: string;
   };
 
@@ -123,6 +135,18 @@ declare namespace API {
   type BaseResponsePageAudioFileVO_ = {
     code?: number;
     data?: PageAudioFileVO_;
+    message?: string;
+  };
+
+  type BaseResponsePageDictionaryWord_ = {
+    code?: number;
+    data?: PageDictionaryWord_;
+    message?: string;
+  };
+
+  type BaseResponsePageDictionaryWordVO_ = {
+    code?: number;
+    data?: PageDictionaryWordVO_;
     message?: string;
   };
 
@@ -237,6 +261,36 @@ declare namespace API {
     id?: number;
   };
 
+  type DictionaryWord = {
+    created_at?: string;
+    dictionary_id?: number;
+    id?: number;
+    word_id?: number;
+  };
+
+  type DictionaryWordAddRequest = {
+    dictionary_id?: number;
+    word_id?: number;
+  };
+
+  type DictionaryWordQueryRequest = {
+    current?: number;
+    dictionary_id?: number;
+    id?: number;
+    notId?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    word_id?: number;
+  };
+
+  type DictionaryWordVO = {
+    create_at?: string;
+    dictionary_id?: number;
+    id?: number;
+    word_id?: number;
+  };
+
   type EnglishDictionary = {
     author?: string;
     create_time?: string;
@@ -259,6 +313,11 @@ declare namespace API {
     name?: string;
     publication_date?: string;
     publisher?: string;
+  };
+
+  type EnglishDictionaryImportRequest = {
+    description?: string[];
+    id?: number;
   };
 
   type EnglishDictionaryQueryRequest = {
@@ -312,6 +371,10 @@ declare namespace API {
     status?: string;
     update_time?: string;
     word_head?: string;
+  };
+
+  type EnglishWordAddBatchRequest = {
+    words?: EnglishWordAddRequest[];
   };
 
   type EnglishWordAddRequest = {
@@ -386,6 +449,11 @@ declare namespace API {
   };
 
   type getAudioFileVOByIdUsingGETParams = {
+    /** id */
+    id?: number;
+  };
+
+  type getDictionaryWordVOByIdUsingGETParams = {
     /** id */
     id?: number;
   };
@@ -499,6 +567,32 @@ declare namespace API {
     orders?: OrderItem[];
     pages?: number;
     records?: AudioFileVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageDictionaryWord_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: DictionaryWord[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageDictionaryWordVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: DictionaryWordVO[];
     searchCount?: boolean;
     size?: number;
     total?: number;

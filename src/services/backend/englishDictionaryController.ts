@@ -47,6 +47,21 @@ export async function getEnglishDictionaryVoByIdUsingGet(
   });
 }
 
+/** importEnglishDictionary POST /api/english_dictionary/import */
+export async function importEnglishDictionaryUsingPost(
+  body: API.EnglishDictionaryImportRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean_>('/api/english_dictionary/import', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** listEnglishDictionaryByPage POST /api/english_dictionary/list/page */
 export async function listEnglishDictionaryByPageUsingPost(
   body: API.EnglishDictionaryQueryRequest,

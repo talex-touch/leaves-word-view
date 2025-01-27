@@ -4,6 +4,7 @@
 // API 唯一标识：
 import * as wxMpController from './wxMpController';
 import * as audioFileController from './audioFileController';
+import * as dictionaryWordController from './dictionaryWordController';
 import * as englishDictionaryController from './englishDictionaryController';
 import * as englishWordController from './englishWordController';
 import * as englishWordChangeLogController from './englishWordChangeLogController';
@@ -16,6 +17,7 @@ import * as userController from './userController';
 export default {
   wxMpController,
   audioFileController,
+  dictionaryWordController,
   englishDictionaryController,
   englishWordController,
   englishWordChangeLogController,
