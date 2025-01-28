@@ -17,8 +17,6 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ data, readonly, scrollWit
   useEffect(() => {
     if (data === null || data === undefined) return
 
-    console.log(data)
-
     const value = `${data || ''}`
 
     setCode(value);

@@ -6,11 +6,22 @@ import { ExclamationCircleOutlined, ImportOutlined, PlusOutlined } from '@ant-de
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Modal, Space, Typography } from 'antd';
+import { Button, message, Modal, Popconfirm, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { Tag } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, CloudUploadOutlined, FileOutlined, LoadingOutlined, MinusCircleOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import BatchImporter from '@/components/Word/BatchImporter';
+
+enum RowActionType {
+  DELETE = 'DELETE',
+  RE_PROCESS_SUPPLY = 'RE_PROCESS_SUPPLY',
+  PROCESS_SUPPLY = 'PROCESS_SUPPLY',
+}
+
+// 3. 定义 StatusActions 的类型
+type StatusActionsType = {
+  [K in RowActionType]: (props: { record: API.EnglishWord }) => JSX.Element;
+};
 
 /**
  * 英语词典管理页面
@@ -50,6 +61,40 @@ const EnglishWordPage: React.FC = () => {
       return false;
     }
   };
+
+  const statusActions: StatusActionsType = {
+    DELETE({ record }) {
+      return <Popconfirm onConfirm={() => handleDelete(record)} title="删除后单词数据需要全部重新编辑，是否确认？">
+        <Typography.Link type="danger"
+
+        >
+          永久删除
+        </Typography.Link>
+      </Popconfirm>
+    },
+    PROCESS_SUPPLY({ record }) {
+      return <Typography.Link
+        onClick={() => {
+          setCurrentRow(record);
+          setUpdateModalVisible(true);
+        }}
+      >
+        扩充处理
+      </Typography.Link>
+    },
+    RE_PROCESS_SUPPLY({ record }) {
+      return <Popconfirm onConfirm={() => {
+        setCurrentRow(record);
+        setUpdateModalVisible(true);
+      }} title="重新扩充处理将会导致状态重新变为 已处理">
+        <Typography.Link
+
+        >
+          重新扩充处理
+        </Typography.Link>
+      </Popconfirm>
+    }
+  }
 
   /**
    * 表格列配置
@@ -135,6 +180,10 @@ const EnglishWordPage: React.FC = () => {
       dataIndex: 'info',
       hideInSearch: true,
       render: (value, data/* , _data, _row, _action */) => {
+        if (data.status === 'UNKNOWN') return <Tag icon={<ExclamationCircleOutlined />} color="#DD001BE0">导入后等待扩充处理</Tag>
+        if (data.status === 'CREATED') return <Tag icon={<ExclamationCircleOutlined />} color="#DD001B80">新建后等待扩充处理</Tag>
+        if (data.status !== 'PROCESSED') return
+
         return <WordContentEditor data={data} value={value as any} />;
       },
       // renderFormItem: () => {
@@ -145,21 +194,24 @@ const EnglishWordPage: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => (
-        <Space size="middle">
-          <Typography.Link
-            onClick={() => {
-              setCurrentRow(record);
-              setUpdateModalVisible(true);
-            }}
-          >
-            修改
-          </Typography.Link>
-          <Typography.Link type="danger" onClick={() => handleDelete(record)}>
-            删除
-          </Typography.Link>
-        </Space>
-      ),
+      render: (_, record) => {
+
+        if (record.status === 'UNKNOWN' || record.status === 'CREATED') {
+          return (
+            <Space size="middle">
+              {statusActions.PROCESS_SUPPLY({ record })}
+              {statusActions.DELETE({ record })}
+            </Space>
+          )
+        }
+
+        return (
+          <Space size="middle">
+            {statusActions.RE_PROCESS_SUPPLY({ record })}
+            {statusActions.DELETE({ record })}
+          </Space>
+        )
+      },
     },
   ];
   return (
