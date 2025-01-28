@@ -1,5 +1,5 @@
-import { Form, Input, Button, Drawer, message, Checkbox, Tabs } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { Form, Input, Button, Drawer, message, Checkbox, Tabs, Modal, Spin, Alert } from 'antd';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import InfoComponent from './InfoComponent';
 import WordPronounceEditor from './WordPronounceEditor';
@@ -11,6 +11,10 @@ import WordImageEditor, { WordImageCreator } from './WordImageEditor';
 import WordAffixEditor from './WordAffixEditor';
 import WordTransformEditor from './WordTransformEditor';
 import WordExampleListEditor from './WordExampleListEditor';
+import { AIButton } from '../common/AIButton';
+import { useLeavesWordAI } from '@/composables/aigc';
+import { ChatEventType } from '@coze/api';
+import { ExclamationCircleFilled, LoadingOutlined } from '@ant-design/icons';
 
 export type Prop = {
   data: API.EnglishWord;
@@ -30,10 +34,15 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
   const [form] = Form.useForm();
   const [currentContent, setCurrentContent] = useState(emptyWordContent());
   const [isDrawerVisible, setDrawerVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
   const [isAdvancedFeaturesEnabled, setAdvancedFeaturesEnabled] = useState(false);
-  const [infoData, setInfoData] = useState(value || '');
+  const [infoData, setInfoData] = useState('');
+  const [supplymentData, setSupplymentData] = useState('');
   const [parseStatus, setParseStatus] = useState<ParseStatus>(ParseStatus.NORMAL);
   const [tipMsg, setTipMsg] = useState('');
+  const [seconds, setSeconds] = useState(-1);
+
+  const [aiSupplying, setAISupplying] = useState(false)
 
   function tryParseInfo(info: string) {
     const [parsedInfo, parseStatus, msg] = parseWordContent(info);
@@ -316,19 +325,151 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
     </>
   ), [currentContent, isAdvancedFeaturesEnabled, infoData, handleSave, handleInfoChange, setAdvancedFeaturesEnabled, setCurrentContent, setInfoData, setDrawerVisible, setParseStatus, setTipMsg, tipMsg, parseStatus, parseWordContent, parseStatus]);
 
+  const renderSupplymentAnalyser = useMemo(() => {
+    try {
+      const obj = JSON.parse(supplymentData)
+
+      const { code, msg, data } = obj
+      if (code === 400) {
+        return (
+          <>
+            <Alert
+              message="生成失败"
+              description={msg}
+              type="warning"
+              showIcon
+              closable
+            />
+            <pre>{JSON.stringify(data, null, 2)}</pre>
+          </>
+        )
+      }
+
+      const handleReplace = () => {
+        // setCurrentContent(data)
+        setInfoData(JSON.stringify(data, null, 2))
+
+        setModalVisible(false)
+      }
+
+      if (seconds > 0) {
+        setTimeout(() => {
+          setSeconds(seconds - 1)
+        }, 1000)
+      } else if (seconds === 0) {
+        setSeconds(-1)
+        handleReplace()
+      }
+
+      return (
+        <>
+          <Alert
+            message={"已成功生成补全 " + msg + (seconds > 0 ? " | 将在 " + seconds + " 秒后自动插入替换" : '')}
+            type="success"
+            showIcon
+            action={
+              <Button variant="outlined" color="green" onClick={handleReplace}>
+                直接插入
+              </Button>
+            }
+          />
+        </>
+      )
+    } catch (e: any) {
+      return (
+        <>
+          <div className='flex items-center gap-2'>
+            <Spin indicator={<LoadingOutlined spin />} size="small" />
+            正在分析扩充内容...
+          </div>
+          <Alert
+            message="生成内容正在校验中"
+            description={e?.message ?? e ?? 'UNKNOWN ERROR'}
+            type="warning"
+            showIcon
+          />
+        </>
+      )
+    }
+  }, [supplymentData, seconds])
+
+  const { callWordSupplymentAI } = useLeavesWordAI()
+
+  const handleAISupply = useCallback(async () => {
+    if (aiSupplying) return
+
+    if (!data.word_head) {
+      message.error('当前单词数据未知，无法进行AI扩充。')
+      return
+    }
+
+    setAISupplying(true)
+
+    const wordSupplymentAI = await callWordSupplymentAI(data.word_head, infoData)
+
+    setModalVisible(true)
+
+    let content = ''
+
+    for await (const part of wordSupplymentAI) {
+
+      if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
+        content += part.data?.content ?? ''
+      } else if (part.event === "conversation.message.completed") {
+        if (part.data.type !== 'answer') continue
+        const value = part.data.content ?? ''
+
+        if (!value) {
+          Modal.confirm({
+            title: 'AI补全出现内容错误',
+            icon: <ExclamationCircleFilled />,
+            content: '是否强行填充内容？这可能会引发未知风险。您也可以选择取消后重新生成。',
+            okText: '强行填充',
+            okType: 'danger',
+            cancelText: '取消本次生成',
+            onOk() {
+              return
+            },
+            onCancel() {
+              setAISupplying(false)
+              setAISupplying(false)
+            },
+          })
+
+          return
+        }
+
+        setInfoData(value)
+      } else if (part.event === "done") {
+        message.info('补全已完成')
+
+        setSeconds(15)
+      }
+
+      setSupplymentData(content)
+    }
+
+    setAISupplying(false)
+  }, [infoData])
+
   return (
     <Form form={form} layout="vertical">
       {editable ? (
         <>
-          <InfoComponent onChange={handleInfoChange} data={infoData} />
+          <InfoComponent scrollWithUpdate onChange={handleInfoChange} data={infoData} />
 
           <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>
             {renderStatusTip}
           </div>
 
-          <Button type="dashed" onClick={() => setDrawerVisible(true)}>
-            进入单词编辑器
-          </Button>
+          <div className='flex items-center gap-4'>
+            <Button type="dashed" onClick={() => setDrawerVisible(true)}>
+              进入单词编辑器
+            </Button>
+            <AIButton loading={aiSupplying} onClick={handleAISupply}>
+              AI扩充
+            </AIButton>
+          </div>
         </>
       ) : (
         <Button variant="outlined" color="volcano" onClick={() => setDrawerVisible(true)}>
@@ -336,7 +477,20 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         </Button>
       )}
 
-
+      <Modal
+        open={isModalVisible}
+        destroyOnClose
+        width="858px"
+        title="LeavesAI 扩充"
+        onCancel={() => setModalVisible(false)}
+        onClose={() => setModalVisible(false)}
+        footer={null}
+      >
+        <div className='flex flex-col justify-center gap-2'>
+          {renderSupplymentAnalyser}
+          <InfoComponent scrollWithUpdate readonly data={supplymentData} />
+        </div>
+      </Modal>
       <Drawer
         title={editable ? "单词编辑器" : "单词审阅器"}
         placement="right"

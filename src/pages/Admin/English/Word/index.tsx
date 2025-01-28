@@ -99,7 +99,7 @@ const EnglishWordPage: React.FC = () => {
           text: <Tag icon={<SyncOutlined />} color="blue">处理中</Tag>,
         },
         PROCESSED: {
-          text: <Tag icon={<CheckCircleOutlined />} color="green">已处理</Tag>,
+          text: <Tag icon={<CheckCircleOutlined />} color="magenta">已处理</Tag>,
         },
         REVIEWING: {
           text: <Tag icon={<SyncOutlined />} color="blue">审核中</Tag>,
