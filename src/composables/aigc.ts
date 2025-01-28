@@ -36,8 +36,28 @@ function callWordSupplymentAI(word: string, info: string = '') {
   })
 }
 
+/**
+ * 创建单词信息评分对话
+ * @param info 需要补全的信息
+ */
+function callWordValidateAI(info: string) {
+  const content = info
+
+  return cozeClient.chat.stream({
+    bot_id: '7464811329795833907',
+    additional_messages: [
+      {
+        role: RoleType.User,
+        content,
+        content_type: 'text'
+      }
+    ]
+  })
+}
+
 export function useLeavesWordAI() {
   return {
-    callWordSupplymentAI
+    callWordSupplymentAI,
+    callWordValidateAI
   }
 }

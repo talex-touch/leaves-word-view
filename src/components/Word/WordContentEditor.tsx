@@ -1,4 +1,4 @@
-import { Form, Input, Button, Drawer, message, Checkbox, Tabs, Modal, Spin, Alert } from 'antd';
+import { Form, Input, Button, Drawer, message, Checkbox, Tabs, Modal, Spin, Alert, Progress, Descriptions, Badge, type DescriptionsProps, Typography } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import InfoComponent from './InfoComponent';
@@ -28,6 +28,35 @@ enum ParseStatus {
   NORMAL = 0,
   ERROR = 1,
   SYNCHORNISED = 2
+}
+
+const RateScoreView = ({ score, maxScore }: { score: number, maxScore: number }) => {
+  const [status, setStatue] = useState<"success" | "normal" | "exception" | "active" | undefined>()
+  const [percent, setPercent] = useState<number>(0)
+
+  useEffect(() => {
+    const passScore = maxScore * 0.6
+    const validatedScore = maxScore * 0.85
+
+    if (score < passScore) {
+      setStatue('exception')
+    } else if (score < validatedScore) {
+      setStatue('normal')
+    } else {
+      setStatue('success')
+    }
+
+    // 把分数映射到0-100
+    const rate = score / maxScore
+    const mappedRate = rate * 100
+
+    setPercent(mappedRate)
+
+  }, [score, maxScore])
+
+  return (
+    <Progress type="circle" format={() => `${percent.toFixed(1)}%`} status={status} percent={percent} size={80} />
+  )
 }
 
 const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) => {
@@ -137,6 +166,213 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
     tryParseInfo(infoData || '')
   }, [infoData])
 
+  const { callWordSupplymentAI, callWordValidateAI } = useLeavesWordAI()
+
+  const handleAISupply = useCallback(async () => {
+    if (aiSupplying) return
+
+    if (!data.word_head) {
+      message.error('当前单词数据未知，无法进行AI扩充。')
+      return
+    }
+
+    setAISupplying(true)
+
+    const wordSupplymentAI = await callWordSupplymentAI(data.word_head, infoData)
+
+    setModalVisible(true)
+
+    let content = ''
+
+    for await (const part of wordSupplymentAI) {
+
+      if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
+        content += part.data?.content ?? ''
+      } else if (part.event === "conversation.message.completed") {
+        if (part.data.type !== 'answer') continue
+        const value = part.data.content ?? ''
+
+        if (!value) {
+          Modal.confirm({
+            title: 'AI补全出现内容错误',
+            icon: <ExclamationCircleFilled />,
+            content: '是否强行填充内容？这可能会引发未知风险。您也可以选择取消后重新生成。',
+            okText: '强行填充',
+            okType: 'danger',
+            cancelText: '取消本次生成',
+            onOk() {
+              return
+            },
+            onCancel() {
+              setAISupplying(false)
+              setAISupplying(false)
+            },
+          })
+
+          return
+        }
+
+        setInfoData(value)
+      } else if (part.event === "done") {
+        message.info('补全已完成')
+
+        setSeconds(15)
+      }
+
+      setSupplymentData(content)
+    }
+
+    setAISupplying(false)
+  }, [infoData])
+
+
+  const [aiValidating, setAIValidating] = useState(false)
+  const [validateInfo, setValidateInfo] = useState('')
+  const [scoreInfo, setScoreInfo] = useState<{ ai: number, manual: number }>({
+    ai: 0,
+    manual: 0
+  })
+  const handleAIValidate = useCallback(async () => {
+    if (aiValidating) return
+
+    if (!infoData) {
+      message.error('当前单词数据未知，无法进行AI验证。')
+      return
+    }
+
+    setValidateInfo('')
+    setAIValidating(true)
+
+    const wordValidateAI = await callWordValidateAI(infoData)
+
+    let content = ''
+
+    for await (const part of wordValidateAI) {
+
+      if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
+        content += part.data?.content ?? ''
+      } else if (part.event === "conversation.message.completed") {
+        if (part.data.type !== 'answer') continue
+        const value = part.data.content ?? ''
+
+        setValidateInfo(value)
+      } else if (part.event === "done") {
+        message.info('审阅已完成')
+      }
+
+      setValidateInfo(content)
+    }
+
+    setAIValidating(false)
+  }, [infoData])
+
+  const renderValidateReview = useMemo(() => {
+    try {
+      const { code, msg, score, summary, data } = JSON.parse(validateInfo)
+
+      setScoreInfo({
+        ...scoreInfo,
+        ai: score
+      })
+
+      const items: DescriptionsProps['items'] = [
+        {
+          key: '1',
+          label: '总体评分',
+          children: (
+            <>
+              {score >= 60 ? (<Progress percent={score} success={{ percent: 60, strokeColor: '#FFD35C' }} type="dashboard" />) : <Progress format={() => `${score}%`} status='exception' percent={60} success={{ percent: score, strokeColor: '#9DC0CE' }} type="dashboard" />}
+            </>
+          ),
+          span: 1
+        },
+        {
+          key: '2',
+          label: '评价总结',
+          children: summary,
+          span: 4
+        },
+        {
+          key: '3',
+          span: 4,
+          label: '单词细节',
+          children: (
+            <div className='flex items-center gap-4'>
+              <RateScoreView maxScore={40} score={data['单词细节'].score}></RateScoreView>
+              <div>
+                <Typography.Paragraph>
+                  {`${data['单词细节'].summary}`}
+                </Typography.Paragraph>
+
+                <Typography.Paragraph>
+                  <Typography.Text strong>
+                    {`${data['单词细节'].enhanced}`}
+                  </Typography.Text>
+                </Typography.Paragraph>
+              </div>
+            </div>
+          ),
+        },
+        {
+          key: '4',
+          span: 4,
+          label: '单词创新',
+          children: (
+            <div className='flex items-center gap-4'>
+              <RateScoreView maxScore={30} score={data['单词创新'].score}></RateScoreView>
+              <div>
+                <Typography.Paragraph>
+                  {`${data['单词创新'].summary}`}
+                </Typography.Paragraph>
+
+                <Typography.Paragraph>
+                  <Typography.Text strong>
+                    {`${data['单词创新'].enhanced}`}
+                  </Typography.Text>
+                </Typography.Paragraph>
+              </div>
+            </div>
+          ),
+        },
+        {
+          key: '5',
+          span: 4,
+          label: '单词结构',
+          children: (
+            <div className='flex items-center gap-4'>
+              <RateScoreView maxScore={20} score={data['单词结构'].score}></RateScoreView>
+              <div>
+                <Typography.Paragraph>
+                  {`${data['单词结构'].summary}`}
+                </Typography.Paragraph>
+
+                <Typography.Paragraph>
+                  <Typography.Text strong>
+                    {`${data['单词结构'].enhanced}`}
+                  </Typography.Text>
+                </Typography.Paragraph>
+              </div>
+            </div>
+          ),
+        },
+        {
+          key: '6',
+          label: '状态',
+          children: <Badge status="processing" text={`对单词 ${msg} 已验证(${code})`} />,
+          span: 3,
+        },
+      ];
+
+      return (
+        <>
+          <Descriptions bordered items={items} />
+        </>
+      )
+    } catch (e) {
+      return <InfoComponent data={validateInfo} />
+    }
+  }, [validateInfo])
+
   const renderStatusTip = useMemo(() => {
     if (parseStatus === ParseStatus.NORMAL) return null
 
@@ -186,10 +422,17 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <>
                 <Form.Item label="审阅评价">
-                  当前暂无任何评价.
+                  {
+                    validateInfo ? (renderValidateReview) : ("当前暂无任何评价.")
+                  }
                 </Form.Item>
                 <Form.Item label="JSON数据">
                   <InfoComponent readonly onChange={handleInfoChange} data={infoData} />
+                </Form.Item>
+                <Form.Item label="操作">
+                  <Button loading={aiValidating} variant='outlined' color='volcano' onClick={handleAIValidate}>
+                    AI评分
+                  </Button>
                 </Form.Item>
               </>
             ),
@@ -316,7 +559,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           </Button>
         ) : (
           <>
-            <Button variant='filled' color='volcano' onClick={handleSave}>
+              <Button disabled={scoreInfo.ai < 85} variant='filled' color='volcano' onClick={handleSave}>
               提交审阅
             </Button>
           </>
@@ -393,64 +636,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
     }
   }, [supplymentData, seconds])
 
-  const { callWordSupplymentAI } = useLeavesWordAI()
 
-  const handleAISupply = useCallback(async () => {
-    if (aiSupplying) return
-
-    if (!data.word_head) {
-      message.error('当前单词数据未知，无法进行AI扩充。')
-      return
-    }
-
-    setAISupplying(true)
-
-    const wordSupplymentAI = await callWordSupplymentAI(data.word_head, infoData)
-
-    setModalVisible(true)
-
-    let content = ''
-
-    for await (const part of wordSupplymentAI) {
-
-      if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-        content += part.data?.content ?? ''
-      } else if (part.event === "conversation.message.completed") {
-        if (part.data.type !== 'answer') continue
-        const value = part.data.content ?? ''
-
-        if (!value) {
-          Modal.confirm({
-            title: 'AI补全出现内容错误',
-            icon: <ExclamationCircleFilled />,
-            content: '是否强行填充内容？这可能会引发未知风险。您也可以选择取消后重新生成。',
-            okText: '强行填充',
-            okType: 'danger',
-            cancelText: '取消本次生成',
-            onOk() {
-              return
-            },
-            onCancel() {
-              setAISupplying(false)
-              setAISupplying(false)
-            },
-          })
-
-          return
-        }
-
-        setInfoData(value)
-      } else if (part.event === "done") {
-        message.info('补全已完成')
-
-        setSeconds(15)
-      }
-
-      setSupplymentData(content)
-    }
-
-    setAISupplying(false)
-  }, [infoData])
 
   return (
     <Form form={form} layout="vertical">
