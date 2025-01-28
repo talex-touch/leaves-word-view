@@ -8,11 +8,12 @@ import WordImageEditor from './WordImageEditor';
 import { emptyExample } from './types';
 
 interface WordTranslationEditorProps {
+  readonly?: boolean;
   initialTranslations: WordTranslation[];
   onSave: (translations: WordTranslation[]) => void;
 }
 
-const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ initialTranslations, onSave }) => {
+const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly, initialTranslations, onSave }) => {
   const [translations, setTranslations] = useState(initialTranslations);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -112,7 +113,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ initialTr
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => [
+      render: (text, record, index, action) => !readonly && [
         <a
           key="edit"
           onClick={() => {
@@ -152,7 +153,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ initialTr
         columns={columns}
         value={translations}
         onChange={(value) => setTranslations([...value])}
-        recordCreatorProps={{
+        recordCreatorProps={readonly ? false : {
           newRecordType: 'dataSource',
           record: () => {
             const targetType = remainingTypeTexts?.[0] || WordType.NOUN

@@ -1,4 +1,4 @@
-import { Form, Input, Button, Drawer, message, Checkbox, Tabs, Modal, Spin, Alert, Progress, Descriptions, Badge, type DescriptionsProps, Typography } from 'antd';
+import { Form, Input, Button, Drawer, message, Checkbox, Tabs, Modal, Spin, Alert, Progress, Descriptions, Badge, type DescriptionsProps, Typography, Popconfirm, InputNumber } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import InfoComponent from './InfoComponent';
@@ -55,7 +55,7 @@ const RateScoreView = ({ score, maxScore }: { score: number, maxScore: number })
   }, [score, maxScore])
 
   return (
-    <Progress type="circle" format={() => `${percent.toFixed(1)}%`} status={status} percent={percent} size={80} />
+    <Progress type="circle" format={() => `${percent.toFixed(1)}分`} status={status} percent={percent} size={80} />
   )
 }
 
@@ -281,7 +281,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           label: '总体评分',
           children: (
             <>
-              {score >= 60 ? (<Progress percent={score} success={{ percent: 60, strokeColor: '#FFD35C' }} type="dashboard" />) : <Progress format={() => `${score}%`} status='exception' percent={60} success={{ percent: score, strokeColor: '#9DC0CE' }} type="dashboard" />}
+              {score >= 60 ? (<Progress percent={score} success={{ percent: 60, strokeColor: '#FFD35C' }} type="dashboard" />) : <Progress format={() => `${score}分`} status='exception' percent={60} success={{ percent: score, strokeColor: '#9DC0CE' }} type="dashboard" />}
             </>
           ),
           span: 1
@@ -430,9 +430,30 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
                   <InfoComponent readonly onChange={handleInfoChange} data={infoData} />
                 </Form.Item>
                 <Form.Item label="操作">
-                  <Button loading={aiValidating} variant='outlined' color='volcano' onClick={handleAIValidate}>
+                  <Button className='mx-2' loading={aiValidating} variant='outlined' color='volcano' onClick={handleAIValidate}>
                     AI评分
                   </Button>
+                  <Popconfirm
+                    title="人工评分"
+                    description={
+                      <>
+                        <p>请输入你对单词的整体打分</p>
+                        <InputNumber className='w-full' min={0} max={100} onChange={(value) => {
+                          setScoreInfo({
+                            ...scoreInfo,
+                            manual: +(value ?? 0)
+                          })
+                        }}
+                        />
+                      </>
+                    }
+                    showCancel={false}
+                  >
+                    <Button className='mx-2' disabled={aiValidating} variant='outlined' color='geekblue'>
+                      人工评分
+                    </Button>
+                  </Popconfirm>
+
                 </Form.Item>
               </>
             ),
@@ -443,10 +464,10 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <>
                 <Form.Item name="britishPronounce" label="英式发音" rules={[{ required: true, message: '请输入英式发音!' }]}>
-                  <WordPronounceEditor value={currentContent.britishPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, britishPronounce: pronounce })} />
+                  <WordPronounceEditor readonly={!editable} value={currentContent.britishPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, britishPronounce: pronounce })} />
                 </Form.Item>
                 <Form.Item name="americanPronounce" label="美式发音" rules={[{ required: true, message: '请输入美式发音!' }]}>
-                  <WordPronounceEditor value={currentContent.americanPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, americanPronounce: pronounce })} />
+                  <WordPronounceEditor readonly={!editable} value={currentContent.americanPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, americanPronounce: pronounce })} />
                 </Form.Item>
               </>
             ),
@@ -460,9 +481,9 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
                   <span className='hidden'>
                     {JSON.stringify(currentContent.img)}
                   </span>
-                  <WordImageEditor value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
+                  <WordImageEditor readonly={!editable} value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
                 </Form.Item>
-                {data?.id && <WordImageCreator wordId={data.id!} onSubmit={(img) => setCurrentContent({ ...currentContent, img: [...currentContent.img, img] })} />}
+                {data?.id && editable && <WordImageCreator wordId={data.id!} onSubmit={(img) => setCurrentContent({ ...currentContent, img: [...currentContent.img, img] })} />}
               </>
             ),
           },
@@ -471,7 +492,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             key: '3',
             children: (
               <Form.Item name="translation" label="翻译" rules={[{ required: true, message: '请编辑翻译内容!' }]}>
-                <WordTranslationEditor
+                <WordTranslationEditor readonly={!editable}
                   initialTranslations={currentContent.translation}
                   onSave={(updatedTranslations) => setCurrentContent({ ...currentContent, translation: updatedTranslations })}
                 />
@@ -484,6 +505,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <Form.Item name="examplePhrases" label="短语" rules={[{ required: true, message: '请编辑短语!' }]}>
                 <WordExampleListEditor
+                  readonly={!editable}
                   value={currentContent.examplePhrases}
                   onChange={(updatedExamplePhrased) => setCurrentContent({ ...currentContent, examplePhrases: updatedExamplePhrased })}
                 />
@@ -496,6 +518,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <Form.Item name="transform" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
                 <WordTransformEditor
+                  readonly={!editable}
                   initialTransforms={currentContent.transform}
                   onSave={(updatedTransforms) => setCurrentContent({ ...currentContent, transform: updatedTransforms })}
                 />
@@ -508,6 +531,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <Form.Item name="derived" label="单词网络" rules={[{ required: true, message: '请编辑单词网络!' }]}>
                 <WordDerivedEditor
+                  readonly={!editable}
                   initialDerivedWords={currentContent.derived}
                   onSave={(updatedDerivedWords) => setCurrentContent({ ...currentContent, derived: updatedDerivedWords })}
                 />
@@ -520,6 +544,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <Form.Item name="parts" label="单词组成" rules={[{ required: true, message: '请编辑单词组成!' }]}>
                 <WordAffixEditor
+                  readonly={!editable}
                   initialAffixParts={currentContent.parts}
                   onSave={(updatedAffixParts) => setCurrentContent({ ...currentContent, parts: updatedAffixParts })}
                 />
@@ -532,7 +557,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             children: (
               <>
                 <Form.Item name="advancedFeatures" valuePropName="checked">
-                  <Checkbox onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
+                  <Checkbox disabled={!editable} onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
                 </Form.Item>
                 {isAdvancedFeaturesEnabled && (
                   <>
@@ -558,11 +583,12 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             校验并提交
           </Button>
         ) : (
-          <>
-              <Button disabled={scoreInfo.ai < 85} variant='filled' color='volcano' onClick={handleSave}>
+          <div className='flex items-center gap-2'>
+            {(scoreInfo.ai < 75) && (`还差 ${75 - scoreInfo.ai} 分达到标准线`)}
+            <Button disabled={scoreInfo.ai < 75} variant='filled' color='volcano' onClick={handleSave}>
               提交审阅
             </Button>
-          </>
+          </div>
         )}
       </div>
     </>
@@ -678,7 +704,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         </div>
       </Modal>
       <Drawer
-        title={editable ? "单词编辑器" : "单词审阅器"}
+        title={editable ? "单词编辑器" : `单词审阅器 (${data.word_head})`}
         placement="right"
         width='85%'
         destroyOnClose

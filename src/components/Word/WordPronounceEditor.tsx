@@ -7,7 +7,7 @@ import { SpeechType, useRemoteAudio } from '@/composables/common';
 interface WordPronounceEditorProps {
   value?: WordPronounce;
   onChange?: (pronounce: WordPronounce) => void;
-  readonly?: boolean; // 添加 readonly 属性
+  readonly?: boolean;
 }
 
 export const WordPronounceEditorInner: React.FC<WordPronounceEditorProps> = ({ value, onChange, readonly }) => {
@@ -243,10 +243,9 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
           >
             <div className='flex flex-center gap-2'>
 
-
-              <Button variant='dashed' onClick={handleQuickImport}>
+              {!readonly && <Button variant='dashed' onClick={handleQuickImport}>
                 自动从内容导入
-              </Button>
+              </Button>}
               <Button variant='filled' color='primary' onClick={handlePreview}>
                 预览试听
               </Button>

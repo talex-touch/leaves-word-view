@@ -4,11 +4,12 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { WordAffixPart, WordAffixType, WordAffixTypeDescription } from './types/WordAffixPart';
 
 interface WordAffixEditorProps {
+  readonly?: boolean;
   initialAffixParts: WordAffixPart[];
   onSave: (affixParts: WordAffixPart[]) => void;
 }
 
-const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ initialAffixParts, onSave }) => {
+const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffixParts, onSave }) => {
   const [affixParts, setAffixParts] = useState(initialAffixParts);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -52,7 +53,7 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ initialAffixParts, on
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => [
+      render: (text, record, index, action) => !readonly && [
         <a
           key="edit"
           onClick={() => {
@@ -92,7 +93,7 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ initialAffixParts, on
         columns={columns}
         value={affixParts}
         onChange={(value) => setAffixParts([...value])}
-        recordCreatorProps={{
+        recordCreatorProps={readonly ? false : {
           newRecordType: 'dataSource',
           record: () => {
 

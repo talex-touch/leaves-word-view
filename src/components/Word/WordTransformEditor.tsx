@@ -5,11 +5,12 @@ import { WordTransform, TransformType } from './types/WordTransform';
 import WordExampleEditor from './WordExampleEditor';
 
 interface WordTransformEditorProps {
+  readonly?: boolean;
   initialTransforms: WordTransform[];
   onSave: (transforms: WordTransform[]) => void;
 }
 
-const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ initialTransforms, onSave }) => {
+const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, initialTransforms, onSave }) => {
   const [transforms, setTransforms] = useState(initialTransforms);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -60,7 +61,7 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ initialTransf
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => [
+      render: (text, record, index, action) => !readonly && [
         <a
           key="edit"
           onClick={() => {
@@ -100,7 +101,7 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ initialTransf
         columns={columns}
         value={transforms}
         onChange={(value) => setTransforms([...value])}
-        recordCreatorProps={{
+        recordCreatorProps={readonly ? false : {
           newRecordType: 'dataSource',
           record: () => {
             return {

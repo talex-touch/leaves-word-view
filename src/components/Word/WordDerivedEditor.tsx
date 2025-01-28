@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { EditableProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import { WordDerived, DerivationTypeEnum } from './types'; 
+import { WordDerived, DerivationTypeEnum } from './types';
 
-interface WordDerivedEditorProps { // 修改: WordTranslationEditorProps 改为 WordDerivedEditorProps
-  initialDerivedWords: WordDerived[]; // 修改: initialTranslations 改为 initialDerivedWords
+interface WordDerivedEditorProps {
+  readonly?: boolean;
+  initialDerivedWords: WordDerived[];
   onSave: (derivedWords: WordDerived[]) => void;
 }
 
-const WordDerivedEditor: React.FC<WordDerivedEditorProps> = ({ initialDerivedWords, onSave }) => { // 修改: WordTranslationEditor 改为 WordDerivedEditor, initialTranslations 改为 initialDerivedWords
+const WordDerivedEditor: React.FC<WordDerivedEditorProps> = ({ readonly, initialDerivedWords, onSave }) => { // 修改: WordTranslationEditor 改为 WordDerivedEditor, initialTranslations 改为 initialDerivedWords
   const [derivedWords, setDerivedWords] = useState(initialDerivedWords);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -48,7 +49,7 @@ const WordDerivedEditor: React.FC<WordDerivedEditorProps> = ({ initialDerivedWor
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => [
+      render: (text, record, index, action) => !readonly && [
         <a
           key="edit"
           onClick={() => {
@@ -83,12 +84,12 @@ const WordDerivedEditor: React.FC<WordDerivedEditorProps> = ({ initialDerivedWor
 
   return (
     <div>
-      <EditableProTable<WordDerived> 
+      <EditableProTable<WordDerived>
         rowKey="type"
         columns={columns}
         value={derivedWords}
         onChange={(value) => setDerivedWords([...value])}
-        recordCreatorProps={{
+        recordCreatorProps={readonly ? false : {
           newRecordType: 'dataSource',
           record: () => {
             const targetType = remainingTypeTexts?.[0] || DerivationTypeEnum.ANTONYM

@@ -8,6 +8,7 @@ import { request } from '@umijs/max';
 
 interface WordImageEditorProps {
   value: string[];
+  readonly?: boolean;
   onChange: (translations: string[]) => void;
 }
 
@@ -16,7 +17,7 @@ type Image = {
   url: string;
 }
 
-const WordImageEditor: React.FC<WordImageEditorProps> = ({ value, onChange }) => {
+const WordImageEditor: React.FC<WordImageEditorProps> = ({ value, readonly, onChange }) => {
   const [imageList, setImageList] = useState<Image[]>([]);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -52,7 +53,7 @@ const WordImageEditor: React.FC<WordImageEditorProps> = ({ value, onChange }) =>
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => [
+      render: (text, record, index, action) => !readonly && [
         <a
           key="edit"
           onClick={() => {
@@ -87,7 +88,7 @@ const WordImageEditor: React.FC<WordImageEditorProps> = ({ value, onChange }) =>
         columns={columns}
         value={imageList}
         onChange={setImageList}
-        recordCreatorProps={{
+        recordCreatorProps={readonly ? false : {
           newRecordType: 'dataSource',
           record: () => {
             return {
@@ -130,7 +131,7 @@ export const WordImageCreator = ({ wordId, onSubmit }: WordImageCreatorProp) => 
       mediaType: 'IMAGE'
     }) as string
 
-    console.log({res})
+    console.log({ res })
 
     // data: [{ "data": "data:", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }, { "data": "waiting", "mediaType": null }, { "data": "\n\n", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }] data: [{ "data": "id:20250126001541F2DDA3A00F77B0803B9E\nevent:Message\ndata:", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }, { "data": { "content": "{\"add\":\"The person's mouth is moving as they speak, and there are small speech bubbles coming out. The floor is a light wood texture. There are no other distractions in the background.\",\"neg\":\"Blur, noise, distortion, discolored\",\"pos\":\"A person engaged in a lively conversation, with a friendly expression and animated gestures. The background is a simple and clean space with soft lighting. The colors are warm and inviting, with a combination of light brown and pale yellow. The person is dressed casually and comfortably.\"}", "node_title": "输出_1", "node_seq_id": "0", "node_is_finish": true, "ext": null }, "mediaType": null }, { "data": "\n\n", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }] data: [{ "data": "id:20250126001541F2DDA3A00F77B0803B9E\nevent:Message\ndata:", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }, { "data": { "content": "https://s.coze.cn/t/_3Y3dFN7YNE/", "node_title": "输出_2", "node_seq_id": "0", "node_is_finish": true, "ext": null }, "mediaType": null }, { "data": "\n\n", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }] data: [{ "data": "id:20250126001541F2DDA3A00F77B0803B9E\nevent:Message\ndata:", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }, { "data": { "content": "{\"output\":\"https://s.coze.cn/t/_3Y3dFN7YNE/\"}", "node_title": "End", "node_seq_id": "0", "node_is_finish": true, "ext": null }, "mediaType": null }, { "data": "\n\n", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }] data: [{ "data": "id:20250126001541F2DDA3A00F77B0803B9E\nevent:Done\ndata:", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }, { "data": null, "mediaType": null }, { "data": "\n\n", "mediaType": { "type": "text", "subtype": "plain", "parameters": { "charset": "UTF-8" }, "qualityValue": 1.0, "charset": "UTF-8", "concrete": true, "subtypeSuffix": null, "wildcardSubtype": false, "wildcardType": false } }]
 

@@ -6,10 +6,11 @@ import { WordExample, emptyExample } from './types/WordExample';
 
 interface WordExampleListEditorProps {
   value?: WordExample[];
+  readonly?: boolean;
   onChange: (examples: WordExample[]) => void;
 }
 
-const WordExampleListEditor: React.FC<WordExampleListEditorProps> = ({ value, onChange }) => {
+const WordExampleListEditor: React.FC<WordExampleListEditorProps> = ({ value, readonly, onChange }) => {
   const [exampleList, setExampleList] = useState([...(value || [])].map((example, index) => ({ id: index, example })));
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -35,7 +36,7 @@ const WordExampleListEditor: React.FC<WordExampleListEditorProps> = ({ value, on
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => [
+      render: (text, record, index, action) => !readonly && [
         <a
           key="edit"
           onClick={() => {
@@ -67,7 +68,7 @@ const WordExampleListEditor: React.FC<WordExampleListEditorProps> = ({ value, on
         columns={columns}
         value={exampleList}
         onChange={(value) => setExampleList([...value])}
-        recordCreatorProps={{
+        recordCreatorProps={readonly ? false : {
           newRecordType: 'dataSource',
           record: () => {
             return {
