@@ -675,7 +675,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           </div>
 
           <div className='flex items-center justify-between w-[800px] gap-16'>
-            <Button type="dashed" onClick={() => setDrawerVisible(true)}>
+            <Button size='large' type="dashed" onClick={() => setDrawerVisible(true)}>
               进入单词编辑器
             </Button>
             <AIButton loading={aiSupplying} onClick={handleAISupply}>
