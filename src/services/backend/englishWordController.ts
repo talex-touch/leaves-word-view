@@ -107,6 +107,21 @@ export async function listMyEnglishWordVoByPageUsingPost(
   });
 }
 
+/** scoreEnglishWord POST /api/english_word/score */
+export async function scoreEnglishWordUsingPost(
+  body: API.EnglishWordScoreRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean_>('/api/english_word/score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** updateEnglishWord POST /api/english_word/update */
 export async function updateEnglishWordUsingPost(
   body: API.EnglishWordUpdateRequest,

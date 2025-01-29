@@ -477,13 +477,13 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             key: '2',
             children: (
               <>
-                <Form.Item name="img" label="图片列表" rules={[{ required: true, message: '请输入图片列表!' }]}>
+                <Form.Item name="img" label="图片列表">
                   <span className='hidden'>
                     {JSON.stringify(currentContent.img)}
                   </span>
                   <WordImageEditor readonly={!editable} value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
                 </Form.Item>
-                {data?.id && editable && <WordImageCreator wordId={data.id!} onSubmit={(img) => setCurrentContent({ ...currentContent, img: [...currentContent.img, img] })} />}
+                {data?.id && editable && <WordImageCreator wordId={data.id!} onSubmit={(img) => setCurrentContent({ ...currentContent, img: [...(currentContent.img || []), ...(img || [])] })} />}
               </>
             ),
           },

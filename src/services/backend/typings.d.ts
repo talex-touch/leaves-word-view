@@ -418,7 +418,6 @@ declare namespace API {
   };
 
   type EnglishWordQueryRequest = {
-    content?: string;
     current?: number;
     id?: number;
     notId?: number;
@@ -427,8 +426,14 @@ declare namespace API {
     sortField?: string;
     sortOrder?: string;
     status?: string;
-    title?: string;
     userId?: number;
+  };
+
+  type EnglishWordScoreRequest = {
+    aiContent?: string;
+    aiScore?: number;
+    id?: number;
+    score?: number;
   };
 
   type EnglishWordUpdateRequest = {
@@ -522,6 +527,7 @@ declare namespace API {
     current?: number;
     id?: number;
     mediaType?: string;
+    mediaUrl?: string;
     notId?: number;
     pageSize?: number;
     sortField?: string;

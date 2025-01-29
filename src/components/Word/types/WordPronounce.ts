@@ -15,5 +15,7 @@ export function emptyWordPronounce(): WordPronounce {
 }
 
 export function isValidPronounce(pronounce: WordPronounce): boolean {
+  if ( !pronounce ) return false
+
   return pronounce.content !== '' && pronounce.audio !== '';
 }
