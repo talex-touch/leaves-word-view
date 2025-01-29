@@ -668,13 +668,13 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
     <Form form={form} layout="vertical">
       {editable ? (
         <>
-          <InfoComponent scrollWithUpdate onChange={handleInfoChange} data={infoData} />
+          <InfoComponent readonly={aiSupplying} scrollWithUpdate={aiSupplying} onChange={handleInfoChange} data={infoData} />
 
           <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>
             {renderStatusTip}
           </div>
 
-          <div className='flex items-center gap-4'>
+          <div className='flex items-center justify-between w-[800px] gap-16'>
             <Button type="dashed" onClick={() => setDrawerVisible(true)}>
               进入单词编辑器
             </Button>

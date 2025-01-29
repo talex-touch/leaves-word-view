@@ -83,6 +83,17 @@ const EnglishWordPage: React.FC = () => {
       </Typography.Link>
     },
     RE_PROCESS_SUPPLY({ record }) {
+      if (record.status === 'PROCESSED') {
+        return <Typography.Link
+          onClick={() => {
+            setCurrentRow(record);
+            setUpdateModalVisible(true);
+          }}
+        >
+          重新扩充处理
+        </Typography.Link>
+      }
+
       return <Popconfirm onConfirm={() => {
         setCurrentRow(record);
         setUpdateModalVisible(true);
