@@ -108,6 +108,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListEnglishDictionary_ = {
+    code?: number;
+    data?: EnglishDictionary[];
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO_ = {
     code?: number;
     data?: LoginUserVO;
@@ -135,6 +141,12 @@ declare namespace API {
   type BaseResponsePageAudioFileVO_ = {
     code?: number;
     data?: PageAudioFileVO_;
+    message?: string;
+  };
+
+  type BaseResponsePageCategory_ = {
+    code?: number;
+    data?: PageCategory_;
     message?: string;
   };
 
@@ -244,6 +256,29 @@ declare namespace API {
     code?: number;
     data?: UserVO;
     message?: string;
+  };
+
+  type Category = {
+    createdAt?: string;
+    description?: string;
+    id?: number;
+    isRoot?: boolean;
+    name?: string;
+    parentId?: number;
+    sortOrder?: number;
+    updatedAt?: string;
+  };
+
+  type CategoryQueryRequest = {
+    current?: number;
+    description?: string;
+    id?: number;
+    name?: string;
+    notId?: number;
+    pageSize?: number;
+    searchText?: string;
+    sortField?: string;
+    sortOrder?: string;
   };
 
   type checkUsingGETParams = {
@@ -578,6 +613,19 @@ declare namespace API {
     total?: number;
   };
 
+  type PageCategory_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: Category[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
   type PageDictionaryWord_ = {
     countId?: string;
     current?: number;
@@ -839,6 +887,11 @@ declare namespace API {
     updateTime?: string;
     user?: UserVO;
     userId?: number;
+  };
+
+  type selectOneUsingGETParams = {
+    /** id */
+    id?: number;
   };
 
   type SseEmitter = {

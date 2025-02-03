@@ -62,6 +62,14 @@ export async function importEnglishDictionaryUsingPost(
   });
 }
 
+/** listEnglishDictionary GET /api/english_dictionary/list */
+export async function listEnglishDictionaryUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListEnglishDictionary_>('/api/english_dictionary/list', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** listEnglishDictionaryByPage POST /api/english_dictionary/list/page */
 export async function listEnglishDictionaryByPageUsingPost(
   body: API.EnglishDictionaryQueryRequest,
