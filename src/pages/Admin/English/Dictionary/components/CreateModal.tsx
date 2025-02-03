@@ -1,4 +1,4 @@
-import { addEnglishDictionaryUsingPost } from '@/services/backend/englishDictionaryController'; // 修改: addUserUsingPost -> addEnglishDictionaryUsingPost
+import { addEnglishDictionaryUsingPost } from '@/services/backend/englishDictionaryController';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { message, Modal } from 'antd';
@@ -7,7 +7,7 @@ import React from 'react';
 interface Props {
   visible: boolean;
   columns: ProColumns<API.EnglishDictionary>[];
-  onSubmit: (values: API.EnglishDictionaryAddRequest) => void; // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
+  onSubmit: (values: API.EnglishDictionaryAddRequest) => void;
   onCancel: () => void;
 }
 
@@ -15,10 +15,10 @@ interface Props {
  * 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.EnglishDictionaryAddRequest) => { // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
+const handleAdd = async (fields: API.EnglishDictionaryAddRequest) => {
   const hide = message.loading('正在添加');
   try {
-    await addEnglishDictionaryUsingPost(fields); // 修改: addUserUsingPost -> addEnglishDictionaryUsingPost
+    await addEnglishDictionaryUsingPost(fields);
     hide();
     message.success('创建成功');
     return true;
@@ -50,7 +50,7 @@ const CreateModal: React.FC<Props> = (props) => {
       <ProTable
         type="form"
         columns={columns}
-        onSubmit={async (values: API.EnglishDictionaryAddRequest) => { // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
+        onSubmit={async (values: API.EnglishDictionaryAddRequest) => {
           const success = await handleAdd(values);
           if (success) {
             onSubmit?.(values);

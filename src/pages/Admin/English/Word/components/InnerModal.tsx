@@ -3,7 +3,7 @@ import '@umijs/max';
 import { Button, Drawer, Form, Input, message, type FormProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 
-type Request = API.EnglishWordAddRequest | API.EnglishWordUpdateRequest
+type Request = API.EnglishWordAddRequest | API.EnglishWordUpdateRequest;
 
 interface Props {
   visible: boolean;
@@ -16,11 +16,11 @@ interface Props {
  * 添加节点
  * @param fields
  */
-const handleSubmit = async (fields: Request, props: Props) => { // 修改: API.UserAddRequest -> API.EnglishDictionaryAddRequest
-  console.log({ fields })
+const handleSubmit = async (fields: Request, props: Props) => {
+  console.log({ fields });
   const hide = message.loading('正在提交');
   try {
-    await props.onSubmit(fields); // 修改: addUserUsingPost -> addEnglishDictionaryUsingPost
+    await props.onSubmit(fields);
     hide();
     message.success('提交成功');
     return true;
@@ -39,13 +39,12 @@ const handleSubmit = async (fields: Request, props: Props) => { // 修改: API.U
 const InnerModal: React.FC<Props> = (props) => {
   const { visible, oldData, onCancel } = props;
 
-
-  const [word, setWord] = useState("")
+  const [word, setWord] = useState('');
   // const [info, setInfo] = useState("")
 
   const onFinish: FormProps<Request>['onFinish'] = (values) => {
     console.log('Success:', values);
-    handleSubmit(values, props)
+    handleSubmit(values, props);
   };
 
   const onFinishFailed: FormProps<Request>['onFinishFailed'] = (errorInfo) => {
@@ -53,8 +52,8 @@ const InnerModal: React.FC<Props> = (props) => {
   };
 
   useEffect(() => {
-    setWord(oldData?.word_head || "")
-  }, [])
+    setWord(oldData?.word_head || '');
+  }, []);
 
   return (
     <Drawer // 修改: 将 Modal 替换为 Drawer
@@ -82,7 +81,7 @@ const InnerModal: React.FC<Props> = (props) => {
           <Input value={word} onChange={(e) => setWord(e.target.value)}></Input>
         </Form.Item>
 
-        {oldData?.id &&
+        {oldData?.id && (
           <Form.Item<Request>
             label="信息"
             name="info"
@@ -90,7 +89,7 @@ const InnerModal: React.FC<Props> = (props) => {
           >
             <WordContentEditor editable data={oldData} />
           </Form.Item>
-        }
+        )}
         <Form.Item label={null}>
           <Button type="primary" htmlType="submit">
             提交

@@ -9,52 +9,49 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { Button, message, Space, TreeSelect, Typography } from 'antd';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface CategoryTree extends API.Category {
   children?: CategoryTree[];
 }
 
+export type CategoryTreeSelectProps = {
+  data: API.Category[];
+  value?: string;
+  onChange?: (value: string) => void;
+};
+
+function buildTree(categories: CategoryTree[]): CategoryTree[] {
+  const map = new Map<number, CategoryTree>();
+  const roots: CategoryTree[] = [];
+
+  // 创建所有节点的映射并初始化children
+  categories.forEach((item) => {
+    map.set(item.id!, { ...item, children: [] });
+  });
+
+  // 构建父子关系
+  categories.forEach((item) => {
+    const node = map.get(item.id!)!;
+    const parentId = item.parentId || 0;
+
+    // if (item.id === +value) return;
+
+    if (parentId === 0 || !map.has(parentId)) {
+      roots.push(node);
+    } else {
+      map.get(parentId)!.children!.push(node);
+    }
+  });
+
+  return roots;
+}
+
 /**
  * 分类选择下拉框
  */
-const CategoryTreeSelect = ({
-  data,
-  value,
-  onChange,
-}: {
-  data: API.Category[];
-  value: string;
-  onChange: (value: string) => void;
-}) => {
+export const CategoryTreeSelect = ({ data, value, onChange }: CategoryTreeSelectProps) => {
   const [selectValue, setSelectValue] = useState<string>();
-
-  function buildTree(categories: CategoryTree[]): CategoryTree[] {
-    const map = new Map<number, CategoryTree>();
-    const roots: CategoryTree[] = [];
-
-    // 创建所有节点的映射并初始化children
-    categories.forEach((item) => {
-      map.set(item.id!, { ...item, children: [] });
-    });
-
-    // 构建父子关系
-    categories.forEach((item) => {
-      const node = map.get(item.id!)!;
-      const parentId = item.parentId || 0;
-
-      // if (item.id === +value) return;
-
-      if (parentId === 0 || !map.has(parentId)) {
-        roots.push(node);
-      } else {
-        map.get(parentId)!.children!.push(node);
-      }
-    });
-
-    return roots;
-  }
-
   const treeData = useMemo(() => buildTree(data), [value, data]);
 
   useEffect(() => {
@@ -62,7 +59,7 @@ const CategoryTreeSelect = ({
   }, [value]);
 
   useEffect(() => {
-    onChange(selectValue || '');
+    onChange?.(selectValue || '');
   }, [selectValue]);
 
   return (
@@ -75,6 +72,63 @@ const CategoryTreeSelect = ({
       allowClear
       treeDefaultExpandAll
       onChange={(value) => setSelectValue(value)}
+      treeData={treeData}
+      fieldNames={{
+        label: 'name',
+        value: 'id',
+        children: 'children',
+      }}
+      // onPopupScroll={onPopupScroll}
+    />
+  );
+};
+
+export type MultiCategoryTreeSelectProps = {
+  // data: API.Category[];
+  /** default: 5 */
+  maxCount?: number;
+  value?: string[];
+  onChange?: (value: string[]) => void;
+};
+
+export const MultiCategoryTreeSelect = ({
+  value,
+  maxCount,
+  onChange,
+}: MultiCategoryTreeSelectProps) => {
+  const fetchData = useCallback(async () => {
+    const { data, code } = await listCategoryByPageUsingPost({} as API.CategoryQueryRequest);
+
+    if (code === 0) {
+      return data?.records ?? [];
+    } else {
+      console.warn(`获取分类列表失败，${code}`);
+
+      return [];
+    }
+  }, []);
+  const [data, setData] = useState<API.Category[]>([]);
+
+  useEffect(() => {
+    fetchData().then((data) => {
+      setData(data);
+    });
+  }, []);
+
+  const treeData = useMemo(() => buildTree(data), [value, data]);
+
+  return (
+    <TreeSelect
+      maxCount={maxCount ?? 5}
+      multiple
+      showSearch
+      style={{ width: '100%' }}
+      value={value}
+      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+      placeholder="请选择分类"
+      allowClear
+      treeDefaultExpandAll
+      onChange={onChange}
       treeData={treeData}
       fieldNames={{
         label: 'name',

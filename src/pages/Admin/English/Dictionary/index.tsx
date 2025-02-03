@@ -1,12 +1,16 @@
 import CreateModal from '@/pages/Admin/English/Dictionary/components/CreateModal';
 import UpdateModal from '@/pages/Admin/English/Dictionary/components/UpdateModal';
-import { deleteEnglishDictionaryUsingPost, listEnglishDictionaryByPageUsingPost } from '@/services/backend/englishDictionaryController';
+import {
+  deleteEnglishDictionaryUsingPost,
+  listEnglishDictionaryByPageUsingPost,
+} from '@/services/backend/englishDictionaryController';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { Button, message, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
+import CategoryModal from './components/CategoryModal';
 
 /**
  * 英语词典管理页面
@@ -18,6 +22,8 @@ const UserAdminPage: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+  // 是否显示分类管理窗口
+  const [categoryModalVisible, setCategoryModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   // 当前用户点击的数据
   const [currentRow, setCurrentRow] = useState<API.EnglishDictionary>();
@@ -123,6 +129,22 @@ const UserAdminPage: React.FC = () => {
           >
             修改
           </Typography.Link>
+          {/* <Typography.Link
+            onClick={() => {
+              setCurrentRow(record);
+              setUpdateModalVisible(true);
+            }}
+          >
+            单词管理
+          </Typography.Link> */}
+          <Typography.Link
+            onClick={() => {
+              setCurrentRow(record);
+              setCategoryModalVisible(true);
+            }}
+          >
+            分类管理
+          </Typography.Link>
           {/* <Typography.Link type="danger" onClick={() => handleDelete(record)}>
             删除
           </Typography.Link> */}
@@ -191,6 +213,18 @@ const UserAdminPage: React.FC = () => {
         }}
         onCancel={() => {
           setUpdateModalVisible(false);
+        }}
+      />
+      <CategoryModal
+        visible={categoryModalVisible}
+        dictionary={currentRow}
+        onSubmit={() => {
+          setCategoryModalVisible(false);
+          setCurrentRow(undefined);
+          actionRef.current?.reload();
+        }}
+        onCancel={() => {
+          setCategoryModalVisible(false);
         }}
       />
     </PageContainer>

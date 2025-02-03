@@ -1,4 +1,4 @@
-import { addEnglishWordUsingPost } from '@/services/backend/englishWordController'; // 修改: addUserUsingPost -> addEnglishDictionaryUsingPost
+import { addEnglishWordUsingPost } from '@/services/backend/englishWordController';
 import { ProColumns } from '@ant-design/pro-components';
 import '@umijs/max';
 import React from 'react';
@@ -21,7 +21,6 @@ const CreateModal: React.FC<Props> = (props) => {
   const { visible, onSubmit, onCancel } = props;
 
   return (
-
     <InnerModal
       visible={visible}
       onCancel={() => {
@@ -31,16 +30,13 @@ const CreateModal: React.FC<Props> = (props) => {
         const success = await addEnglishWordUsingPost(values);
         if (success) {
           onSubmit?.(values);
-          return true
+          return true;
         }
 
-        return false
-      }}>
-
-    </InnerModal>
+        return false;
+      }}
+    ></InnerModal>
   );
 };
 
 export default CreateModal;
-
-

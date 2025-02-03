@@ -108,6 +108,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListCategory_ = {
+    code?: number;
+    data?: Category[];
+    message?: string;
+  };
+
   type BaseResponseListEnglishDictionary_ = {
     code?: number;
     data?: EnglishDictionary[];
@@ -279,6 +285,11 @@ declare namespace API {
     searchText?: string;
     sortField?: string;
     sortOrder?: string;
+  };
+
+  type CategoryRelativeRequest = {
+    category_ids?: number[];
+    dict_id?: number;
   };
 
   type checkUsingGETParams = {
@@ -491,6 +502,11 @@ declare namespace API {
   type getAudioFileVOByIdUsingGETParams = {
     /** id */
     id?: number;
+  };
+
+  type getDictionaryCategoryByDictionaryIdUsingGETParams = {
+    /** dict_id */
+    dict_id: number;
   };
 
   type getDictionaryWordVOByIdUsingGETParams = {
