@@ -37,9 +37,9 @@ export function isValidWordDerived(derived: WordDerived): boolean {
     return false;
   }
 
-  if (!derived.data || derived.data.size === 0) {
-    return false;
-  }
+  // if (!derived.data || derived.data.size === 0) {
+  //   return false;
+  // }
 
   return true;
 }
