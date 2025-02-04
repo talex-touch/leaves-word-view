@@ -69,11 +69,7 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
               disabled={readonly}
             />
           </Form.Item>
-          <Form.Item
-            name="addon"
-            label="附加信息"
-            rules={[{ required: !readonly, message: '请输入附加信息!' }]}
-          >
+          <Form.Item name="addon" label="附加信息">
             <Input type="text" placeholder="附加信息" disabled={readonly} />
           </Form.Item>
           <Form.Item

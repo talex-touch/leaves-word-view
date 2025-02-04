@@ -40,6 +40,7 @@ import { AIButton } from '../common/AIButton';
 import { useLeavesWordAI } from '@/composables/aigc';
 import { ChatEventType } from '@coze/api';
 import { ExclamationCircleFilled, LoadingOutlined } from '@ant-design/icons';
+import { scoreEnglishWordUsingPost } from '@/services/backend/englishWordController';
 
 export type Prop = {
   data: API.EnglishWord;
@@ -265,6 +266,82 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
     ai: 0,
     manual: 0,
   });
+
+  const handleScore = () => {
+    if (scoreInfo.manual < 60) {
+      message.error('人工评分不得低于60分！');
+      return;
+    }
+
+    form.validateFields().then(async () => {
+      message.loading('正在检验配置...');
+
+      if (!isValidPronounce(currentContent.britishPronounce)) {
+        message.error('英式发音未通过检验！');
+        return;
+      }
+
+      if (!isValidPronounce(currentContent.americanPronounce)) {
+        message.error('美式发音未通过检验！');
+        return;
+      }
+
+      if (!currentContent.img.length) {
+        message.error('图片列表未通过检验！');
+        return;
+      }
+
+      if (isValidTranslationList(currentContent.translation)) {
+        message.error('翻译列表未通过检验！');
+        return;
+      }
+
+      if (
+        !currentContent.examplePhrases.length ||
+        !currentContent.examplePhrases.every(
+          (example) => example.type === WordExampleTypeEnum.PHRASE && example.translation,
+        )
+      ) {
+        message.error('短语列表未通过检验！');
+        return;
+      }
+
+      if (!isValidWordDerivedList(currentContent.derived)) {
+        message.error('单词网络列表未通过检验！');
+        return;
+      }
+
+      if (!isValidWordTransformList(currentContent.transform)) {
+        message.error('词形变化列表未通过检验！');
+        return;
+      }
+
+      if (!isValidWordAffixPartList(currentContent.parts)) {
+        message.error('单词组成列表未通过检验！');
+        return;
+      }
+
+      message.success('检验通过！');
+      message.loading('正在提交分数...');
+
+      const res = await scoreEnglishWordUsingPost({
+        aiContent: validateInfo,
+        aiScore: scoreInfo.ai,
+        score: scoreInfo.manual,
+        id: data.id,
+      });
+
+      if (res.code !== 0) {
+        message.error(`提交分数失败：${res.message}`);
+        return;
+      }
+
+      message.success('提交分数成功！');
+
+      setDrawerVisible(false);
+    });
+  };
+
   const handleAIValidate = useCallback(async () => {
     if (aiValidating) return;
 
@@ -709,7 +786,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
                 disabled={scoreInfo.ai < 75}
                 variant="filled"
                 color="volcano"
-                onClick={handleSave}
+                onClick={handleScore}
               >
                 提交审阅
               </Button>

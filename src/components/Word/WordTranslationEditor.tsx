@@ -6,6 +6,7 @@ import { WordTranslation, WordType } from './types/WordTranslation';
 import WordPronounceEditor from './WordPronounceEditor';
 import WordImageEditor from './WordImageEditor';
 import { emptyExample } from './types';
+import WordExampleEditor from './WordExampleEditor';
 
 interface WordTranslationEditorProps {
   readonly?: boolean;
@@ -91,20 +92,16 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({
     {
       title: '示例',
       dataIndex: 'example',
-      hideInTable: true,
-      formItemProps: () => {
-        return {
-          rules: [{ required: true, message: '此项为必填项' }],
-        };
-      },
+      renderFormItem: () => <WordExampleEditor />,
+      render: () => <WordExampleEditor readonly />,
     },
-    {
-      title: '音频',
-      dataIndex: 'audio',
-      valueType: 'text',
-      render: () => <WordPronounceEditor readonly />,
-      renderFormItem: () => <WordPronounceEditor />,
-    },
+    // {
+    //   title: '音频',
+    //   dataIndex: 'audio',
+    //   valueType: 'text',
+    //   render: () => <WordPronounceEditor readonly />,
+    //   renderFormItem: () => <WordPronounceEditor />,
+    // },
     {
       title: '频率',
       dataIndex: 'frequency',

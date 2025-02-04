@@ -34,9 +34,9 @@ export function isValidWordTransform(transform: WordTransform): boolean {
     return false;
   }
 
-  if (!transform.id) {
-    return false;
-  }
+  // if (!transform.id) {
+  //   return false;
+  // }
 
   if (!transform.type) {
     return false;
