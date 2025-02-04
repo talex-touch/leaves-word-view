@@ -16,6 +16,8 @@ export enum DerivationTypeEnum {
 }
 
 export interface WordDerived {
+  id?: number
+
   type: DerivationTypeEnum;
   content: string;
   data: Map<string, string>;

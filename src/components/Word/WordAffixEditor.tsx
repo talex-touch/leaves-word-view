@@ -9,7 +9,11 @@ interface WordAffixEditorProps {
   onSave: (affixParts: WordAffixPart[]) => void;
 }
 
-const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffixParts, onSave }) => {
+const WordAffixEditor: React.FC<WordAffixEditorProps> = ({
+  readonly,
+  initialAffixParts,
+  onSave,
+}) => {
   const [affixParts, setAffixParts] = useState(initialAffixParts);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -19,12 +23,14 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffi
       dataIndex: 'type',
       valueType: 'select',
       fieldProps: {
-        options: Object.keys(WordAffixType).map(key => ({ label: WordAffixType[key as keyof typeof WordAffixType], value: key })),
+        options: Object.keys(WordAffixType).map((key) => ({
+          label: WordAffixType[key as keyof typeof WordAffixType],
+          value: key,
+        })),
       },
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -33,8 +39,7 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffi
       dataIndex: 'content',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -43,8 +48,7 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffi
       dataIndex: 'description',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -53,34 +57,40 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffi
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => !readonly && [
-        <a
-          key="edit"
-          onClick={() => {
-            // 编辑操作逻辑
-            action?.startEditable?.(index);
-          }}
-        >
-          编辑
-        </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            // delete editable
-            setEditableRowKeys(editableKeys.filter((key) => key !== index));
+      render: (text, record, index, action) =>
+        !readonly && [
+          <a
+            key="edit"
+            onClick={() => {
+              console.log({ text, record, index, action });
+              action?.startEditable?.(record.id!);
+            }}
+          >
+            编辑
+          </a>,
+          <a
+            key="delete"
+            onClick={() => {
+              // delete editable
+              setEditableRowKeys(editableKeys.filter((key) => key !== index));
 
-            const updatedAffixParts = affixParts.filter((_, i) => i !== index);
+              const updatedAffixParts = affixParts.filter((_, i) => i !== index);
 
-            setAffixParts(updatedAffixParts);
+              setAffixParts(updatedAffixParts);
 
-            onSave(updatedAffixParts);
-          }}
-        >
-          删除
-        </a>,
-      ],
+              onSave(updatedAffixParts);
+            }}
+          >
+            删除
+          </a>,
+        ],
     },
   ];
+
+  const affixPartList = useMemo(
+    () => [...affixParts].map((item, index) => ({ ...item, id: index })),
+    [affixParts],
+  );
 
   const handleSave = () => {
     onSave(affixParts);
@@ -91,20 +101,23 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffi
       <EditableProTable<WordAffixPart>
         rowKey="type"
         columns={columns}
-        value={affixParts}
+        value={affixPartList}
         onChange={(value) => setAffixParts([...value])}
-        recordCreatorProps={readonly ? false : {
-          newRecordType: 'dataSource',
-          record: () => {
-
-            return {
-              type: WordAffixType.NONE,
-              content: '',
-              data: {},
-              description: WordAffixTypeDescription[WordAffixType.NONE],
-            }
-          },
-        }}
+        recordCreatorProps={
+          readonly
+            ? false
+            : {
+                newRecordType: 'dataSource',
+                record: () => {
+                  return {
+                    type: WordAffixType.NONE,
+                    content: '',
+                    data: {},
+                    description: WordAffixTypeDescription[WordAffixType.NONE],
+                  };
+                },
+              }
+        }
         toolBarRender={false}
         pagination={false}
         editable={{
@@ -113,7 +126,7 @@ const WordAffixEditor: React.FC<WordAffixEditorProps> = ({ readonly, initialAffi
           onSave: async (rowKey, data, row) => {
             console.log(rowKey, data, row);
 
-            handleSave()
+            handleSave();
           },
           onChange: setEditableRowKeys,
         }}

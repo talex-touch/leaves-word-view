@@ -16,12 +16,15 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
   const [form] = Form.useForm();
 
   const handleSave = () => {
-    form.validateFields().then((values) => {
-      onChange?.(values as WordExample);
-      setIsModalVisible(false);
-    }).catch((errorInfo) => {
-      console.log('Validation Failed:', errorInfo);
-    });
+    form
+      .validateFields()
+      .then((values) => {
+        onChange?.(values as WordExample);
+        setIsModalVisible(false);
+      })
+      .catch((errorInfo) => {
+        console.log('Validation Failed:', errorInfo);
+      });
   };
 
   const showModal = () => {
@@ -34,7 +37,7 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
 
   return (
     <div>
-      <Button size='small' type="dashed" onClick={showModal}>
+      <Button size="small" type="dashed" onClick={showModal}>
         配置示例
       </Button>
       <Modal
@@ -60,8 +63,8 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
           >
             <Segmented
               options={[
-                { label: WordExampleTypeEnum.SENTENCE, value: WordExampleTypeEnum.SENTENCE },
-                { label: WordExampleTypeEnum.PHRASE, value: WordExampleTypeEnum.PHRASE },
+                { label: '句子', value: WordExampleTypeEnum.SENTENCE },
+                { label: '短语', value: WordExampleTypeEnum.PHRASE },
               ]}
               disabled={readonly}
             />
@@ -71,44 +74,28 @@ const WordExampleEditor: React.FC<WordExampleEditorProps> = ({ value, onChange, 
             label="附加信息"
             rules={[{ required: !readonly, message: '请输入附加信息!' }]}
           >
-            <Input
-              type="text"
-              placeholder="附加信息"
-              disabled={readonly}
-            />
+            <Input type="text" placeholder="附加信息" disabled={readonly} />
           </Form.Item>
           <Form.Item
             name="highlight"
             label="高亮部分"
             rules={[{ required: !readonly, message: '请输入高亮部分!' }]}
           >
-            <Input
-              type="text"
-              placeholder="高亮部分"
-              disabled={readonly}
-            />
+            <Input type="text" placeholder="高亮部分" disabled={readonly} />
           </Form.Item>
           <Form.Item
             name="sentence"
             label="句子"
             rules={[{ required: !readonly, message: '请输入句子!' }]}
           >
-            <Input
-              type="text"
-              placeholder="句子"
-              disabled={readonly}
-            />
+            <Input type="text" placeholder="句子" disabled={readonly} />
           </Form.Item>
           <Form.Item
             name="translation"
             label="翻译"
             rules={[{ required: !readonly, message: '请输入翻译!' }]}
           >
-            <Input
-              type="text"
-              placeholder="翻译"
-              disabled={readonly}
-            />
+            <Input type="text" placeholder="翻译" disabled={readonly} />
           </Form.Item>
           <Form.Item
             name={['audio', 'content']}

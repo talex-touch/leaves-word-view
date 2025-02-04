@@ -1,8 +1,8 @@
 import { emptyWordPronounce, type WordPronounce } from './WordPronounce';
 
 export enum WordExampleTypeEnum {
-  SENTENCE = "句子",
-  PHRASE = "短语",
+  SENTENCE = "SENTENCE",
+  PHRASE = "PHRASE",
 }
 
 export interface WordExample {

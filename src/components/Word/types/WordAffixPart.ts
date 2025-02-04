@@ -20,6 +20,8 @@ export const WordAffixTypeDescription: { [key in WordAffixType]: string } = {
 };
 
 export interface WordAffixPart {
+  id?: number;
+
   type: WordAffixType;
   content: string;
   data: { [key: string]: string };

@@ -10,7 +10,11 @@ interface WordTransformEditorProps {
   onSave: (transforms: WordTransform[]) => void;
 }
 
-const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, initialTransforms, onSave }) => {
+const WordTransformEditor: React.FC<WordTransformEditorProps> = ({
+  readonly,
+  initialTransforms,
+  onSave,
+}) => {
   const [transforms, setTransforms] = useState(initialTransforms);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
@@ -20,12 +24,14 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, ini
       dataIndex: 'type',
       valueType: 'select',
       fieldProps: {
-        options: Object.keys(TransformType).map(key => ({ label: TransformType[key as keyof typeof TransformType], value: key })),
+        options: Object.keys(TransformType).map((key) => ({
+          label: TransformType[key as keyof typeof TransformType],
+          value: key,
+        })),
       },
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -34,8 +40,7 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, ini
       dataIndex: 'content',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -44,8 +49,7 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, ini
       dataIndex: 'description',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -61,34 +65,40 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, ini
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => !readonly && [
-        <a
-          key="edit"
-          onClick={() => {
-            // 编辑操作逻辑
-            action?.startEditable?.(index);
-          }}
-        >
-          编辑
-        </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            // delete editable
-            setEditableRowKeys(editableKeys.filter((key) => key !== index));
+      render: (text, record, index, action) =>
+        !readonly && [
+          <a
+            key="edit"
+            onClick={() => {
+              // 编辑操作逻辑
+              action?.startEditable?.(index);
+            }}
+          >
+            编辑
+          </a>,
+          <a
+            key="delete"
+            onClick={() => {
+              // delete editable
+              setEditableRowKeys(editableKeys.filter((key) => key !== index));
 
-            const updatedTransforms = transforms.filter((_, i) => i !== index);
+              const updatedTransforms = transforms.filter((_, i) => i !== index);
 
-            setTransforms(updatedTransforms);
+              setTransforms(updatedTransforms);
 
-            onSave(updatedTransforms);
-          }}
-        >
-          删除
-        </a>,
-      ],
+              onSave(updatedTransforms);
+            }}
+          >
+            删除
+          </a>,
+        ],
     },
   ];
+
+  const transformList = useMemo(
+    () => [...transforms].map((item, index) => ({ ...item, id: index })),
+    [transforms],
+  );
 
   const handleSave = () => {
     onSave(transforms);
@@ -99,23 +109,28 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, ini
       <EditableProTable<WordTransform>
         rowKey="id"
         columns={columns}
-        value={transforms}
+        value={transformList}
         onChange={(value) => setTransforms([...value])}
-        recordCreatorProps={readonly ? false : {
-          newRecordType: 'dataSource',
-          record: () => {
-            return {
-              id: Date.now(), // 假设使用当前时间戳作为唯一标识
-              type: TransformType.NONE,
-              content: '',
-              data: {},
-              example: { // 假设 example 是一个对象，需要根据实际情况定义
-                id: 0,
-                content: '',
-              },
-            }
-          },
-        }}
+        recordCreatorProps={
+          readonly
+            ? false
+            : {
+                newRecordType: 'dataSource',
+                record: () => {
+                  return {
+                    id: Date.now(), // 假设使用当前时间戳作为唯一标识
+                    type: TransformType.NONE,
+                    content: '',
+                    data: {},
+                    example: {
+                      // 假设 example 是一个对象，需要根据实际情况定义
+                      id: 0,
+                      content: '',
+                    },
+                  };
+                },
+              }
+        }
         toolBarRender={false}
         pagination={false}
         editable={{
@@ -124,7 +139,7 @@ const WordTransformEditor: React.FC<WordTransformEditorProps> = ({ readonly, ini
           onSave: async (rowKey, data, row) => {
             console.log(rowKey, data, row);
 
-            handleSave()
+            handleSave();
           },
           onChange: setEditableRowKeys,
         }}

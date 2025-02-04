@@ -1,11 +1,36 @@
-import { Form, Input, Button, Drawer, message, Checkbox, Tabs, Modal, Spin, Alert, Progress, Descriptions, Badge, type DescriptionsProps, Typography, Popconfirm, InputNumber } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Drawer,
+  message,
+  Checkbox,
+  Tabs,
+  Modal,
+  Spin,
+  Alert,
+  Progress,
+  Descriptions,
+  Badge,
+  type DescriptionsProps,
+  Typography,
+  Popconfirm,
+  InputNumber,
+} from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import InfoComponent from './InfoComponent';
 import WordPronounceEditor from './WordPronounceEditor';
 import WordTranslationEditor from './WordTranslationEditor';
 import { emptyWordContent, parseWordContent } from './types/WordContent';
-import { isValidPronounce, isValidTranslationList, isValidWordAffixPartList, isValidWordDerivedList, isValidWordTransformList, WordExampleTypeEnum } from './types';
+import {
+  isValidPronounce,
+  isValidTranslationList,
+  isValidWordAffixPartList,
+  isValidWordDerivedList,
+  isValidWordTransformList,
+  WordExampleTypeEnum,
+} from './types';
 import WordDerivedEditor from './WordDerivedEditor';
 import WordImageEditor, { WordImageCreator } from './WordImageEditor';
 import WordAffixEditor from './WordAffixEditor';
@@ -21,43 +46,48 @@ export type Prop = {
   value?: string | null;
   editable?: boolean;
   onChange?: (wordContent: string) => void;
-}
+};
 
 enum ParseStatus {
   UNKNOWN = -1,
   NORMAL = 0,
   ERROR = 1,
-  SYNCHORNISED = 2
+  SYNCHORNISED = 2,
 }
 
-const RateScoreView = ({ score, maxScore }: { score: number, maxScore: number }) => {
-  const [status, setStatue] = useState<"success" | "normal" | "exception" | "active" | undefined>()
-  const [percent, setPercent] = useState<number>(0)
+const RateScoreView = ({ score, maxScore }: { score: number; maxScore: number }) => {
+  const [status, setStatue] = useState<'success' | 'normal' | 'exception' | 'active' | undefined>();
+  const [percent, setPercent] = useState<number>(0);
 
   useEffect(() => {
-    const passScore = maxScore * 0.6
-    const validatedScore = maxScore * 0.85
+    const passScore = maxScore * 0.6;
+    const validatedScore = maxScore * 0.85;
 
     if (score < passScore) {
-      setStatue('exception')
+      setStatue('exception');
     } else if (score < validatedScore) {
-      setStatue('normal')
+      setStatue('normal');
     } else {
-      setStatue('success')
+      setStatue('success');
     }
 
     // 把分数映射到0-100
-    const rate = score / maxScore
-    const mappedRate = rate * 100
+    const rate = score / maxScore;
+    const mappedRate = rate * 100;
 
-    setPercent(mappedRate)
-
-  }, [score, maxScore])
+    setPercent(mappedRate);
+  }, [score, maxScore]);
 
   return (
-    <Progress type="circle" format={() => `${percent.toFixed(1)}分`} status={status} percent={percent} size={80} />
-  )
-}
+    <Progress
+      type="circle"
+      format={() => `${percent.toFixed(1)}分`}
+      status={status}
+      percent={percent}
+      size={80}
+    />
+  );
+};
 
 const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) => {
   const [form] = Form.useForm();
@@ -71,7 +101,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
   const [tipMsg, setTipMsg] = useState('');
   const [seconds, setSeconds] = useState(-1);
 
-  const [aiSupplying, setAISupplying] = useState(false)
+  const [aiSupplying, setAISupplying] = useState(false);
 
   function tryParseInfo(info: string) {
     const [parsedInfo, parseStatus, msg] = parseWordContent(info);
@@ -85,7 +115,7 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
 
       form.setFieldsValue(currentContent);
 
-      return
+      return;
     }
 
     setTipMsg('');
@@ -93,9 +123,9 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
       setTipMsg(msg!);
       setParseStatus(ParseStatus.ERROR);
 
-      console.warn("解析失败，请检查输入格式！")
+      console.warn('解析失败，请检查输入格式！');
     } else {
-      console.warn(parsedInfo)
+      console.warn(parsedInfo);
 
       setParseStatus(ParseStatus.UNKNOWN);
     }
@@ -106,50 +136,55 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
   }, [value, isDrawerVisible]);
 
   const handleSave = () => {
-    form.validateFields().then(values => {
-      message.loading("正在检验配置...")
+    form.validateFields().then((values) => {
+      message.loading('正在检验配置...');
 
       if (!isValidPronounce(currentContent.britishPronounce)) {
-        message.error("英式发音未通过检验！")
+        message.error('英式发音未通过检验！');
         return;
       }
 
       if (!isValidPronounce(currentContent.americanPronounce)) {
-        message.error("美式发音未通过检验！")
+        message.error('美式发音未通过检验！');
         return;
       }
 
       if (!currentContent.img.length) {
-        message.error("图片列表未通过检验！")
+        message.error('图片列表未通过检验！');
         return;
       }
 
       if (isValidTranslationList(currentContent.translation)) {
-        message.error("翻译列表未通过检验！")
+        message.error('翻译列表未通过检验！');
         return;
       }
 
-      if (!currentContent.examplePhrases.length || !(currentContent.examplePhrases.every(example => example.type === WordExampleTypeEnum.PHRASE && example.translation))) {
-        message.error("短语列表未通过检验！")
+      if (
+        !currentContent.examplePhrases.length ||
+        !currentContent.examplePhrases.every(
+          (example) => example.type === WordExampleTypeEnum.PHRASE && example.translation,
+        )
+      ) {
+        message.error('短语列表未通过检验！');
         return;
       }
 
       if (isValidWordDerivedList(currentContent.derived)) {
-        message.error("单词网络列表未通过检验！")
+        message.error('单词网络列表未通过检验！');
         return;
       }
 
       if (isValidWordTransformList(currentContent.transform)) {
-        message.error("词形变化列表未通过检验！")
+        message.error('词形变化列表未通过检验！');
         return;
       }
 
       if (isValidWordAffixPartList(currentContent.parts)) {
-        message.error("单词组成列表未通过检验！")
+        message.error('单词组成列表未通过检验！');
         return;
       }
 
-      message.success("检验通过！")
+      message.success('检验通过！');
       setCurrentContent(values);
       setInfoData(JSON.stringify(currentContent, null, 2));
       setDrawerVisible(false);
@@ -160,37 +195,36 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
 
   const handleInfoChange = (newInfo: string) => {
     setInfoData(newInfo);
-  }
+  };
 
   useEffect(() => {
-    tryParseInfo(infoData || '')
-  }, [infoData])
+    tryParseInfo(infoData || '');
+  }, [infoData]);
 
-  const { callWordSupplymentAI, callWordValidateAI } = useLeavesWordAI()
+  const { callWordSupplymentAI, callWordValidateAI } = useLeavesWordAI();
 
   const handleAISupply = useCallback(async () => {
-    if (aiSupplying) return
+    if (aiSupplying) return;
 
     if (!data.word_head) {
-      message.error('当前单词数据未知，无法进行AI扩充。')
-      return
+      message.error('当前单词数据未知，无法进行AI扩充。');
+      return;
     }
 
-    setAISupplying(true)
+    setAISupplying(true);
 
-    const wordSupplymentAI = await callWordSupplymentAI(data.word_head, infoData)
+    const wordSupplymentAI = await callWordSupplymentAI(data.word_head, infoData);
 
-    setModalVisible(true)
+    setModalVisible(true);
 
-    let content = ''
+    let content = '';
 
     for await (const part of wordSupplymentAI) {
-
       if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-        content += part.data?.content ?? ''
-      } else if (part.event === "conversation.message.completed") {
-        if (part.data.type !== 'answer') continue
-        const value = part.data.content ?? ''
+        content += part.data?.content ?? '';
+      } else if (part.event === 'conversation.message.completed') {
+        if (part.data.type !== 'answer') continue;
+        const value = part.data.content ?? '';
 
         if (!value) {
           Modal.confirm({
@@ -201,79 +235,77 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             okType: 'danger',
             cancelText: '取消本次生成',
             onOk() {
-              return
+              return;
             },
             onCancel() {
-              setAISupplying(false)
-              setAISupplying(false)
+              setAISupplying(false);
+              setAISupplying(false);
             },
-          })
+          });
 
-          return
+          return;
         }
 
-        setInfoData(value)
-      } else if (part.event === "done") {
-        message.info('补全已完成')
+        setInfoData(value);
+      } else if (part.event === 'done') {
+        message.info('补全已完成');
 
-        setSeconds(15)
+        setSeconds(15);
       }
 
-      setSupplymentData(content)
+      setSupplymentData(content);
     }
 
-    setAISupplying(false)
-  }, [infoData])
+    setAISupplying(false);
+  }, [infoData]);
 
-
-  const [aiValidating, setAIValidating] = useState(false)
-  const [validateInfo, setValidateInfo] = useState('')
-  const [scoreInfo, setScoreInfo] = useState<{ ai: number, manual: number }>({
+  const [aiValidating, setAIValidating] = useState(false);
+  const [validateInfo, setValidateInfo] = useState('');
+  const [scoreInfo, setScoreInfo] = useState<{ ai: number; manual: number }>({
     ai: 0,
-    manual: 0
-  })
+    manual: 0,
+  });
   const handleAIValidate = useCallback(async () => {
-    if (aiValidating) return
+    if (aiValidating) return;
 
     if (!infoData) {
-      message.error('当前单词数据未知，无法进行AI验证。')
-      return
+      message.error('当前单词数据未知，无法进行AI验证。');
+      return;
     }
 
-    setValidateInfo('')
-    setAIValidating(true)
+    setValidateInfo('');
+    setAIValidating(true);
 
-    const wordValidateAI = await callWordValidateAI(infoData)
+    const wordValidateAI = await callWordValidateAI(infoData);
 
-    let content = ''
+    let content = '';
 
     for await (const part of wordValidateAI) {
-
       if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-        content += part.data?.content ?? ''
-      } else if (part.event === "conversation.message.completed") {
-        if (part.data.type !== 'answer') continue
-        const value = part.data.content ?? ''
+        content += part.data?.content ?? '';
+      } else if (part.event === 'conversation.message.completed') {
+        if (part.data.type !== 'answer') continue;
+        const value = part.data.content ?? '';
 
-        setValidateInfo(value)
-      } else if (part.event === "done") {
-        message.info('审阅已完成')
+        setValidateInfo(value);
+      } else if (part.event === 'done') {
+        message.info('审阅已完成');
       }
 
-      setValidateInfo(content)
+      setValidateInfo(content);
     }
 
-    setAIValidating(false)
-  }, [infoData])
+    setAIValidating(false);
+  }, [infoData]);
 
   const renderValidateReview = useMemo(() => {
     try {
-      const { code, msg, score, summary, data } = JSON.parse(validateInfo)
+      const { code, msg, score, summary, data } = JSON.parse(validateInfo);
 
       setScoreInfo({
         ...scoreInfo,
-        ai: score
-      })
+        ai: score,
+      });
 
       const items: DescriptionsProps['items'] = [
         {
@@ -281,33 +313,43 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           label: '总体评分',
           children: (
             <>
-              {score >= 60 ? (<Progress percent={score} success={{ percent: 60, strokeColor: '#FFD35C' }} type="dashboard" />) : <Progress format={() => `${score}分`} status='exception' percent={60} success={{ percent: score, strokeColor: '#9DC0CE' }} type="dashboard" />}
+              {score >= 60 ? (
+                <Progress
+                  percent={score}
+                  success={{ percent: 60, strokeColor: '#FFD35C' }}
+                  type="dashboard"
+                />
+              ) : (
+                <Progress
+                  format={() => `${score}分`}
+                  status="exception"
+                  percent={60}
+                  success={{ percent: score, strokeColor: '#9DC0CE' }}
+                  type="dashboard"
+                />
+              )}
             </>
           ),
-          span: 1
+          span: 1,
         },
         {
           key: '2',
           label: '评价总结',
           children: summary,
-          span: 4
+          span: 4,
         },
         {
           key: '3',
           span: 4,
           label: '单词细节',
           children: (
-            <div className='flex items-center gap-4'>
+            <div className="flex items-center gap-4">
               <RateScoreView maxScore={40} score={data['单词细节'].score}></RateScoreView>
               <div>
-                <Typography.Paragraph>
-                  {`${data['单词细节'].summary}`}
-                </Typography.Paragraph>
+                <Typography.Paragraph>{`${data['单词细节'].summary}`}</Typography.Paragraph>
 
                 <Typography.Paragraph>
-                  <Typography.Text strong>
-                    {`${data['单词细节'].enhanced}`}
-                  </Typography.Text>
+                  <Typography.Text strong>{`${data['单词细节'].enhanced}`}</Typography.Text>
                 </Typography.Paragraph>
               </div>
             </div>
@@ -318,17 +360,13 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           span: 4,
           label: '单词创新',
           children: (
-            <div className='flex items-center gap-4'>
+            <div className="flex items-center gap-4">
               <RateScoreView maxScore={30} score={data['单词创新'].score}></RateScoreView>
               <div>
-                <Typography.Paragraph>
-                  {`${data['单词创新'].summary}`}
-                </Typography.Paragraph>
+                <Typography.Paragraph>{`${data['单词创新'].summary}`}</Typography.Paragraph>
 
                 <Typography.Paragraph>
-                  <Typography.Text strong>
-                    {`${data['单词创新'].enhanced}`}
-                  </Typography.Text>
+                  <Typography.Text strong>{`${data['单词创新'].enhanced}`}</Typography.Text>
                 </Typography.Paragraph>
               </div>
             </div>
@@ -339,17 +377,13 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           span: 4,
           label: '单词结构',
           children: (
-            <div className='flex items-center gap-4'>
+            <div className="flex items-center gap-4">
               <RateScoreView maxScore={20} score={data['单词结构'].score}></RateScoreView>
               <div>
-                <Typography.Paragraph>
-                  {`${data['单词结构'].summary}`}
-                </Typography.Paragraph>
+                <Typography.Paragraph>{`${data['单词结构'].summary}`}</Typography.Paragraph>
 
                 <Typography.Paragraph>
-                  <Typography.Text strong>
-                    {`${data['单词结构'].enhanced}`}
-                  </Typography.Text>
+                  <Typography.Text strong>{`${data['单词结构'].enhanced}`}</Typography.Text>
                 </Typography.Paragraph>
               </div>
             </div>
@@ -367,273 +401,380 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         <>
           <Descriptions bordered items={items} />
         </>
-      )
+      );
     } catch (e) {
-      return <InfoComponent data={validateInfo} />
+      return <InfoComponent data={validateInfo} />;
     }
-  }, [validateInfo])
+  }, [validateInfo]);
 
   const renderStatusTip = useMemo(() => {
-    if (parseStatus === ParseStatus.NORMAL) return null
+    if (parseStatus === ParseStatus.NORMAL) return null;
 
     if (parseStatus === ParseStatus.SYNCHORNISED) {
-      return <span>
-        已同步至单词编辑器
-      </span>
+      return <span>已同步至单词编辑器</span>;
     }
 
     if (parseStatus === ParseStatus.ERROR) {
-      return <span>
-        结构不一致，<Button color='primary' variant="text" onClick={() => {
-          const [parsedInfo] = parseWordContent(infoData!);
-          if (!parsedInfo) {
-            message.error("解析失败，请检查输入格式！")
-            return;
-          }
-
-          setInfoData(JSON.stringify(parsedInfo, null, 2));
-          setCurrentContent(parsedInfo!);
-          setParseStatus(ParseStatus.SYNCHORNISED);
-        }}>点击这里强行转换</Button>
+      return (
         <span>
-          {tipMsg}
+          结构不一致，
+          <Button
+            color="primary"
+            variant="text"
+            onClick={() => {
+              const [parsedInfo] = parseWordContent(infoData!);
+              if (!parsedInfo) {
+                message.error('解析失败，请检查输入格式！');
+                return;
+              }
+
+              setInfoData(JSON.stringify(parsedInfo, null, 2));
+              setCurrentContent(parsedInfo!);
+              setParseStatus(ParseStatus.SYNCHORNISED);
+            }}
+          >
+            点击这里强行转换
+          </Button>
+          <span>{tipMsg}</span>
         </span>
-      </span>
+      );
     }
 
     if (parseStatus === ParseStatus.UNKNOWN) {
-      return <span>
-        未知的格式，无法完成解析
-      </span>
+      return <span>未知的格式，无法完成解析</span>;
     }
+  }, [parseStatus]);
 
-  }, [parseStatus])
-
-  const renderWordEditor = useMemo(() => (
-    <>
-      <Tabs
-        className='h-full'
-        defaultActiveKey={editable ? "1" : "0"}
-        tabPosition='left'
-        items={[
-          ...(editable ? [] : [{
-            label: '综合审阅',
-            key: '0',
-            children: (
-              <>
-                <Form.Item label="审阅评价">
+  const renderWordEditor = useMemo(
+    () => (
+      <>
+        <Tabs
+          className="h-full"
+          defaultActiveKey={editable ? '1' : '0'}
+          tabPosition="left"
+          items={[
+            ...(editable
+              ? []
+              : [
                   {
-                    validateInfo ? (renderValidateReview) : ("当前暂无任何评价.")
-                  }
-                </Form.Item>
-                <Form.Item label="JSON数据">
-                  <InfoComponent readonly onChange={handleInfoChange} data={infoData} />
-                </Form.Item>
-                <Form.Item label="操作">
-                  <Button className='mx-2' loading={aiValidating} variant='outlined' color='volcano' onClick={handleAIValidate}>
-                    AI评分
-                  </Button>
-                  <Popconfirm
-                    title="人工评分"
-                    description={
+                    label: '综合审阅',
+                    key: '0',
+                    children: (
                       <>
-                        <p>请输入你对单词的整体打分</p>
-                        <InputNumber className='w-full' min={0} max={100} onChange={(value) => {
-                          setScoreInfo({
-                            ...scoreInfo,
-                            manual: +(value ?? 0)
-                          })
-                        }}
-                        />
+                        <Form.Item label="审阅评价">
+                          {validateInfo ? renderValidateReview : '当前暂无任何评价.'}
+                        </Form.Item>
+                        <Form.Item label="JSON数据">
+                          <InfoComponent readonly onChange={handleInfoChange} data={infoData} />
+                        </Form.Item>
+                        <Form.Item label="操作">
+                          <Button
+                            className="mx-2"
+                            loading={aiValidating}
+                            variant="outlined"
+                            color="volcano"
+                            onClick={handleAIValidate}
+                          >
+                            AI评分
+                          </Button>
+                          <Popconfirm
+                            title="人工评分"
+                            description={
+                              <>
+                                <p>请输入你对单词的整体打分</p>
+                                <InputNumber
+                                  className="w-full"
+                                  min={0}
+                                  max={100}
+                                  onChange={(value) => {
+                                    setScoreInfo({
+                                      ...scoreInfo,
+                                      manual: +(value ?? 0),
+                                    });
+                                  }}
+                                />
+                              </>
+                            }
+                            showCancel={false}
+                          >
+                            <Button
+                              className="mx-2"
+                              disabled={aiValidating}
+                              variant="outlined"
+                              color="geekblue"
+                            >
+                              人工评分
+                            </Button>
+                          </Popconfirm>
+                        </Form.Item>
                       </>
-                    }
-                    showCancel={false}
+                    ),
+                  },
+                ]),
+            {
+              label: '发音配置',
+              key: '1',
+              children: (
+                <>
+                  <Form.Item
+                    name="britishPronounce"
+                    label="英式发音"
+                    rules={[{ required: true, message: '请输入英式发音!' }]}
                   >
-                    <Button className='mx-2' disabled={aiValidating} variant='outlined' color='geekblue'>
-                      人工评分
-                    </Button>
-                  </Popconfirm>
-
+                    <WordPronounceEditor
+                      readonly={!editable}
+                      value={currentContent.britishPronounce}
+                      onChange={(pronounce) =>
+                        setCurrentContent({ ...currentContent, britishPronounce: pronounce })
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="americanPronounce"
+                    label="美式发音"
+                    rules={[{ required: true, message: '请输入美式发音!' }]}
+                  >
+                    <WordPronounceEditor
+                      readonly={!editable}
+                      value={currentContent.americanPronounce}
+                      onChange={(pronounce) =>
+                        setCurrentContent({ ...currentContent, americanPronounce: pronounce })
+                      }
+                    />
+                  </Form.Item>
+                </>
+              ),
+            },
+            {
+              label: '图片列表',
+              key: '2',
+              children: (
+                <>
+                  <Form.Item name="img" label="图片列表">
+                    <span className="hidden">{JSON.stringify(currentContent.img)}</span>
+                    <WordImageEditor
+                      readonly={!editable}
+                      value={currentContent.img}
+                      onChange={(img) => setCurrentContent({ ...currentContent, img: img })}
+                    />
+                  </Form.Item>
+                  {data?.id && editable && (
+                    <WordImageCreator
+                      wordId={data.id!}
+                      onSubmit={(img) =>
+                        setCurrentContent({
+                          ...currentContent,
+                          img: [...(currentContent.img || []), ...(img || [])],
+                        })
+                      }
+                    />
+                  )}
+                </>
+              ),
+            },
+            {
+              label: '翻译',
+              key: '3',
+              children: (
+                <Form.Item name="translation" label="翻译">
+                  <WordTranslationEditor
+                    readonly={!editable}
+                    initialTranslations={currentContent.translation}
+                    onSave={(updatedTranslations) =>
+                      setCurrentContent({ ...currentContent, translation: updatedTranslations })
+                    }
+                  />
                 </Form.Item>
-              </>
-            ),
-          }]),
-          {
-            label: '发音配置',
-            key: '1',
-            children: (
-              <>
-                <Form.Item name="britishPronounce" label="英式发音" rules={[{ required: true, message: '请输入英式发音!' }]}>
-                  <WordPronounceEditor readonly={!editable} value={currentContent.britishPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, britishPronounce: pronounce })} />
+              ),
+            },
+            {
+              label: '短语',
+              key: '4',
+              children: (
+                <Form.Item
+                  name="examplePhrases"
+                  label="短语"
+                  rules={[{ required: true, message: '请编辑短语!' }]}
+                >
+                  <WordExampleListEditor
+                    readonly={!editable}
+                    value={currentContent.examplePhrases}
+                    onChange={(updatedExamplePhrased) =>
+                      setCurrentContent({
+                        ...currentContent,
+                        examplePhrases: updatedExamplePhrased,
+                      })
+                    }
+                  />
                 </Form.Item>
-                <Form.Item name="americanPronounce" label="美式发音" rules={[{ required: true, message: '请输入美式发音!' }]}>
-                  <WordPronounceEditor readonly={!editable} value={currentContent.americanPronounce} onChange={(pronounce) => setCurrentContent({ ...currentContent, americanPronounce: pronounce })} />
+              ),
+            },
+            {
+              label: '词形变化',
+              key: '5',
+              children: (
+                <Form.Item
+                  name="transform"
+                  label="词形变化"
+                  rules={[{ required: true, message: '请编辑词形变化!' }]}
+                >
+                  <WordTransformEditor
+                    readonly={!editable}
+                    initialTransforms={currentContent.transform}
+                    onSave={(updatedTransforms) =>
+                      setCurrentContent({ ...currentContent, transform: updatedTransforms })
+                    }
+                  />
                 </Form.Item>
-              </>
-            ),
-          },
-          {
-            label: '图片列表',
-            key: '2',
-            children: (
-              <>
-                <Form.Item name="img" label="图片列表">
-                  <span className='hidden'>
-                    {JSON.stringify(currentContent.img)}
-                  </span>
-                  <WordImageEditor readonly={!editable} value={currentContent.img} onChange={(img) => setCurrentContent({ ...currentContent, img: img })} />
+              ),
+            },
+            {
+              label: '单词网络',
+              key: '6',
+              children: (
+                <Form.Item
+                  name="derived"
+                  label="单词网络"
+                  rules={[{ required: true, message: '请编辑单词网络!' }]}
+                >
+                  <WordDerivedEditor
+                    readonly={!editable}
+                    initialDerivedWords={currentContent.derived}
+                    onSave={(updatedDerivedWords) =>
+                      setCurrentContent({ ...currentContent, derived: updatedDerivedWords })
+                    }
+                  />
                 </Form.Item>
-                {data?.id && editable && <WordImageCreator wordId={data.id!} onSubmit={(img) => setCurrentContent({ ...currentContent, img: [...(currentContent.img || []), ...(img || [])] })} />}
-              </>
-            ),
-          },
-          {
-            label: '翻译',
-            key: '3',
-            children: (
-              <Form.Item name="translation" label="翻译" rules={[{ required: true, message: '请编辑翻译内容!' }]}>
-                <WordTranslationEditor readonly={!editable}
-                  initialTranslations={currentContent.translation}
-                  onSave={(updatedTranslations) => setCurrentContent({ ...currentContent, translation: updatedTranslations })}
-                />
-              </Form.Item>
-            ),
-          },
-          {
-            label: '短语',
-            key: '4',
-            children: (
-              <Form.Item name="examplePhrases" label="短语" rules={[{ required: true, message: '请编辑短语!' }]}>
-                <WordExampleListEditor
-                  readonly={!editable}
-                  value={currentContent.examplePhrases}
-                  onChange={(updatedExamplePhrased) => setCurrentContent({ ...currentContent, examplePhrases: updatedExamplePhrased })}
-                />
-              </Form.Item>
-            ),
-          },
-          {
-            label: '词形变化',
-            key: '5',
-            children: (
-              <Form.Item name="transform" label="词形变化" rules={[{ required: true, message: '请编辑词形变化!' }]}>
-                <WordTransformEditor
-                  readonly={!editable}
-                  initialTransforms={currentContent.transform}
-                  onSave={(updatedTransforms) => setCurrentContent({ ...currentContent, transform: updatedTransforms })}
-                />
-              </Form.Item>
-            ),
-          },
-          {
-            label: '单词网络',
-            key: '6',
-            children: (
-              <Form.Item name="derived" label="单词网络" rules={[{ required: true, message: '请编辑单词网络!' }]}>
-                <WordDerivedEditor
-                  readonly={!editable}
-                  initialDerivedWords={currentContent.derived}
-                  onSave={(updatedDerivedWords) => setCurrentContent({ ...currentContent, derived: updatedDerivedWords })}
-                />
-              </Form.Item>
-            ),
-          },
-          {
-            label: '单词组成',
-            key: '7',
-            children: (
-              <Form.Item name="parts" label="单词组成" rules={[{ required: true, message: '请编辑单词组成!' }]}>
-                <WordAffixEditor
-                  readonly={!editable}
-                  initialAffixParts={currentContent.parts}
-                  onSave={(updatedAffixParts) => setCurrentContent({ ...currentContent, parts: updatedAffixParts })}
-                />
-              </Form.Item>
-            ),
-          },
-          {
-            label: '拓展功能',
-            key: '8',
-            children: (
-              <>
-                <Form.Item name="advancedFeatures" valuePropName="checked">
-                  <Checkbox disabled={!editable} onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}>启用拓展功能</Checkbox>
+              ),
+            },
+            {
+              label: '单词组成',
+              key: '7',
+              children: (
+                <Form.Item
+                  name="parts"
+                  label="单词组成"
+                  rules={[{ required: true, message: '请编辑单词组成!' }]}
+                >
+                  <WordAffixEditor
+                    readonly={!editable}
+                    initialAffixParts={currentContent.parts}
+                    onSave={(updatedAffixParts) =>
+                      setCurrentContent({ ...currentContent, parts: updatedAffixParts })
+                    }
+                  />
                 </Form.Item>
-                {isAdvancedFeaturesEnabled && (
-                  <>
-                    <Form.Item name="remember" label="记忆方法">
-                      <Input.TextArea rows={4} />
-                    </Form.Item>
-                    <Form.Item name="story" label="故事">
-                      <Input.TextArea rows={4} />
-                    </Form.Item>
-                    <Form.Item name="backgroundStory" label="背景故事">
-                      <Input.TextArea rows={4} />
-                    </Form.Item>
-                  </>
-                )}
-              </>
-            ),
-          },
-        ]}
-      />
-      <div className='z-5 flex justify-end sticky bottom-0'>
-        {editable ? (
-          <Button type="primary" onClick={handleSave}>
-            校验并提交
-          </Button>
-        ) : (
-          <div className='flex items-center gap-2'>
-            {(scoreInfo.ai < 75) && (`还差 ${75 - scoreInfo.ai} 分达到标准线`)}
-            <Button disabled={scoreInfo.ai < 75} variant='filled' color='volcano' onClick={handleSave}>
-              提交审阅
+              ),
+            },
+            {
+              label: '拓展功能',
+              key: '8',
+              children: (
+                <>
+                  <Form.Item name="advancedFeatures" valuePropName="checked">
+                    <Checkbox
+                      disabled={!editable}
+                      onChange={(e) => setAdvancedFeaturesEnabled(e.target.checked)}
+                    >
+                      启用拓展功能
+                    </Checkbox>
+                  </Form.Item>
+                  {isAdvancedFeaturesEnabled && (
+                    <>
+                      <Form.Item name="remember" label="记忆方法">
+                        <Input.TextArea rows={4} />
+                      </Form.Item>
+                      <Form.Item name="story" label="故事">
+                        <Input.TextArea rows={4} />
+                      </Form.Item>
+                      <Form.Item name="backgroundStory" label="背景故事">
+                        <Input.TextArea rows={4} />
+                      </Form.Item>
+                    </>
+                  )}
+                </>
+              ),
+            },
+          ]}
+        />
+        <div className="z-5 flex justify-end sticky bottom-0">
+          {editable ? (
+            <Button type="primary" onClick={handleSave}>
+              校验并提交
             </Button>
-          </div>
-        )}
-      </div>
-    </>
-  ), [currentContent, isAdvancedFeaturesEnabled, infoData, handleSave, handleInfoChange, setAdvancedFeaturesEnabled, setCurrentContent, setInfoData, setDrawerVisible, setParseStatus, setTipMsg, tipMsg, parseStatus, parseWordContent, parseStatus]);
+          ) : (
+            <div className="flex items-center gap-2">
+              {scoreInfo.ai < 75 && `还差 ${75 - scoreInfo.ai} 分达到标准线`}
+              <Button
+                disabled={scoreInfo.ai < 75}
+                variant="filled"
+                color="volcano"
+                onClick={handleSave}
+              >
+                提交审阅
+              </Button>
+            </div>
+          )}
+        </div>
+      </>
+    ),
+    [
+      currentContent,
+      isAdvancedFeaturesEnabled,
+      infoData,
+      handleSave,
+      handleInfoChange,
+      setAdvancedFeaturesEnabled,
+      setCurrentContent,
+      setInfoData,
+      setDrawerVisible,
+      setParseStatus,
+      setTipMsg,
+      tipMsg,
+      parseStatus,
+      parseWordContent,
+      parseStatus,
+    ],
+  );
 
   const renderSupplymentAnalyser = useMemo(() => {
     try {
-      const obj = JSON.parse(supplymentData)
+      const obj = JSON.parse(supplymentData);
 
-      const { code, msg, data } = obj
+      const { code, msg, data } = obj;
       if (code === 400) {
         return (
           <>
-            <Alert
-              message="生成失败"
-              description={msg}
-              type="warning"
-              showIcon
-              closable
-            />
+            <Alert message="生成失败" description={msg} type="warning" showIcon closable />
             <pre>{JSON.stringify(data, null, 2)}</pre>
           </>
-        )
+        );
       }
 
       const handleReplace = () => {
         // setCurrentContent(data)
-        setInfoData(JSON.stringify(data, null, 2))
+        setInfoData(JSON.stringify(data, null, 2));
 
-        setModalVisible(false)
-      }
+        setModalVisible(false);
+      };
 
       if (seconds > 0) {
         setTimeout(() => {
-          setSeconds(seconds - 1)
-        }, 1000)
+          setSeconds(seconds - 1);
+        }, 1000);
       } else if (seconds === 0) {
-        setSeconds(-1)
-        handleReplace()
+        setSeconds(-1);
+        handleReplace();
       }
 
       return (
         <>
           <Alert
-            message={"已成功生成补全 " + msg + (seconds > 0 ? " | 将在 " + seconds + " 秒后自动插入替换" : '')}
+            message={
+              '已成功生成补全 ' +
+              msg +
+              (seconds > 0 ? ' | 将在 ' + seconds + ' 秒后自动插入替换' : '')
+            }
             type="success"
             showIcon
             action={
@@ -643,11 +784,11 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             }
           />
         </>
-      )
+      );
     } catch (e: any) {
       return (
         <>
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <Spin indicator={<LoadingOutlined spin />} size="small" />
             正在分析扩充内容...
           </div>
@@ -658,24 +799,25 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
             showIcon
           />
         </>
-      )
+      );
     }
-  }, [supplymentData, seconds])
-
-
+  }, [supplymentData, seconds]);
 
   return (
     <Form form={form} layout="vertical">
       {editable ? (
         <>
-          <InfoComponent readonly={aiSupplying} scrollWithUpdate={aiSupplying} onChange={handleInfoChange} data={infoData} />
+          <InfoComponent
+            readonly={aiSupplying}
+            scrollWithUpdate={aiSupplying}
+            onChange={handleInfoChange}
+            data={infoData}
+          />
 
-          <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>
-            {renderStatusTip}
-          </div>
+          <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>{renderStatusTip}</div>
 
-          <div className='flex items-center justify-between w-[800px] gap-16'>
-            <Button size='large' type="dashed" onClick={() => setDrawerVisible(true)}>
+          <div className="flex items-center justify-between w-[800px] gap-16">
+            <Button size="large" type="dashed" onClick={() => setDrawerVisible(true)}>
               进入单词编辑器
             </Button>
             <AIButton loading={aiSupplying} onClick={handleAISupply}>
@@ -698,26 +840,23 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         onClose={() => setModalVisible(false)}
         footer={null}
       >
-        <div className='flex flex-col justify-center gap-2'>
+        <div className="flex flex-col justify-center gap-2">
           {renderSupplymentAnalyser}
           <InfoComponent scrollWithUpdate readonly data={supplymentData} />
         </div>
       </Modal>
       <Drawer
-        title={editable ? "单词编辑器" : `单词审阅器 (${data.word_head})`}
+        title={editable ? '单词编辑器' : `单词审阅器 (${data.word_head})`}
         placement="right"
-        width='85%'
+        width="85%"
         destroyOnClose
         onClose={() => setDrawerVisible(false)}
         open={isDrawerVisible}
       >
         {renderWordEditor}
       </Drawer>
-
     </Form>
   );
 };
 
 export default WordContentEditor;
-
-
