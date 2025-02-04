@@ -169,17 +169,17 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         return;
       }
 
-      if (isValidWordDerivedList(currentContent.derived)) {
+      if (!isValidWordDerivedList(currentContent.derived)) {
         message.error('单词网络列表未通过检验！');
         return;
       }
 
-      if (isValidWordTransformList(currentContent.transform)) {
+      if (!isValidWordTransformList(currentContent.transform)) {
         message.error('词形变化列表未通过检验！');
         return;
       }
 
-      if (isValidWordAffixPartList(currentContent.parts)) {
+      if (!isValidWordAffixPartList(currentContent.parts)) {
         message.error('单词组成列表未通过检验！');
         return;
       }

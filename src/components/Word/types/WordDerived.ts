@@ -40,6 +40,7 @@ export function isValidWordDerived(derived: WordDerived): boolean {
   // if (!derived.data || derived.data.size === 0) {
   //   return false;
   // }
+  console.log("here", derived)
 
   return true;
 }
@@ -57,6 +58,8 @@ export function isValidWordDerivedList(derivedList: WordDerived[]): boolean {
   if (derivedList.length > 14) {
     return false;
   }
+
+  console.log(derivedList)
 
   return derivedList.every((item) => isValidWordDerived(item));
 }
