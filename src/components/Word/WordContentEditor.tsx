@@ -817,9 +817,12 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
           <div style={{ marginTop: '0.5rem', opacity: '0.5' }}>{renderStatusTip}</div>
 
           <div className="flex items-center justify-between w-[800px] gap-16">
-            <Button size="large" type="dashed" onClick={() => setDrawerVisible(true)}>
-              进入单词编辑器
-            </Button>
+            {data.status !== 'UNKNOWN' && data.status !== 'CREATED' && (
+              <Button size="large" type="dashed" onClick={() => setDrawerVisible(true)}>
+                进入单词编辑器
+              </Button>
+            )}
+
             <AIButton loading={aiSupplying} onClick={handleAISupply}>
               AI扩充
             </AIButton>
