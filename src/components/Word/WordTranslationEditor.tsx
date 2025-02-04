@@ -13,15 +13,25 @@ interface WordTranslationEditorProps {
   onSave: (translations: WordTranslation[]) => void;
 }
 
-const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly, initialTranslations, onSave }) => {
+const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({
+  readonly,
+  initialTranslations,
+  onSave,
+}) => {
   const [translations, setTranslations] = useState(initialTranslations);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
 
   // 获取 translations 中已经使用过的 typeText
-  const usedTypeTexts = useMemo(() => translations.map(translation => translation.typeText), [translations]);
+  const usedTypeTexts = useMemo(
+    () => translations.map((translation) => translation.typeText),
+    [translations],
+  );
 
   // 获取剩下的 typeText list
-  const remainingTypeTexts = useMemo(() => Object.keys(WordType).filter(key => !usedTypeTexts.includes(key)), [usedTypeTexts]);
+  const remainingTypeTexts = useMemo(
+    () => Object.keys(WordType).filter((key) => !usedTypeTexts.includes(key)),
+    [usedTypeTexts],
+  );
 
   const columns: ProColumns<WordTranslation>[] = [
     {
@@ -29,12 +39,14 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       dataIndex: 'type',
       valueType: 'select',
       fieldProps: {
-        options: remainingTypeTexts.map(key => ({ label: WordType[key as keyof typeof WordType], value: WordType[key as keyof typeof WordType] })),
+        options: remainingTypeTexts.map((key) => ({
+          label: WordType[key as keyof typeof WordType],
+          value: WordType[key as keyof typeof WordType],
+        })),
       },
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -44,8 +56,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       dataIndex: 'typeText',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -55,8 +66,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       width: '150px',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -65,8 +75,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       dataIndex: 'translation',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -75,18 +84,17 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       dataIndex: 'definition',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
     {
       title: '示例',
       dataIndex: 'example',
+      hideInTable: true,
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -103,8 +111,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       valueType: 'digit',
       formItemProps: () => {
         return {
-          rules:
-            [{ required: true, message: '此项为必填项' }],
+          rules: [{ required: true, message: '此项为必填项' }],
         };
       },
     },
@@ -113,32 +120,33 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
       dataIndex: 'operation',
       valueType: 'option',
       fixed: 'right',
-      render: (text, record, index, action) => !readonly && [
-        <a
-          key="edit"
-          onClick={() => {
-            // 编辑操作逻辑
-            action?.startEditable?.(index);
-          }}
-        >
-          编辑
-        </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            // delete editable
-            setEditableRowKeys(editableKeys.filter((key) => key !== index));
+      render: (text, record, index, action) =>
+        !readonly && [
+          <a
+            key="edit"
+            onClick={() => {
+              // 编辑操作逻辑
+              action?.startEditable?.(index);
+            }}
+          >
+            编辑
+          </a>,
+          <a
+            key="delete"
+            onClick={() => {
+              // delete editable
+              setEditableRowKeys(editableKeys.filter((key) => key !== index));
 
-            const updatedTranslations = translations.filter((_, i) => i !== index);
+              const updatedTranslations = translations.filter((_, i) => i !== index);
 
-            setTranslations(updatedTranslations);
+              setTranslations(updatedTranslations);
 
-            onSave(updatedTranslations);
-          }}
-        >
-          删除
-        </a>,
-      ],
+              onSave(updatedTranslations);
+            }}
+          >
+            删除
+          </a>,
+        ],
     },
   ];
 
@@ -146,31 +154,40 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
     onSave(translations);
   };
 
+  const translationList = useMemo(
+    () => [...translations].map((item, index) => ({ ...item, id: index })),
+    [translations],
+  );
+
   return (
     <div>
       <EditableProTable<WordTranslation>
-        rowKey="typeText"
+        rowKey="id"
         columns={columns}
-        value={translations}
+        value={translationList}
         onChange={(value) => setTranslations([...value])}
-        recordCreatorProps={readonly ? false : {
-          newRecordType: 'dataSource',
-          record: () => {
-            const targetType = remainingTypeTexts?.[0] || WordType.NOUN
+        recordCreatorProps={
+          readonly
+            ? false
+            : {
+                newRecordType: 'dataSource',
+                record: () => {
+                  const targetType = remainingTypeTexts?.[0] || WordType.NOUN;
 
-            return {
-              id: translations.length,
-              type: WordType[targetType as keyof typeof WordType],
-              typeText: `${targetType}`,
-              translation: '',
-              definition: '',
-              example: emptyExample(),
-              phonetic: '',
-              audio: emptyWordPronounce(),
-              frequency: 0,
-            }
-          },
-        }}
+                  return {
+                    id: translations.length,
+                    type: WordType[targetType as keyof typeof WordType],
+                    typeText: `${targetType}`,
+                    translation: '',
+                    definition: '',
+                    example: emptyExample(),
+                    phonetic: '',
+                    audio: emptyWordPronounce(),
+                    frequency: 0,
+                  };
+                },
+              }
+        }
         toolBarRender={false}
         pagination={false}
         editable={{
@@ -179,7 +196,7 @@ const WordTranslationEditor: React.FC<WordTranslationEditorProps> = ({ readonly,
           onSave: async (rowKey, data, row) => {
             console.log(rowKey, data, row);
 
-            handleSave()
+            handleSave();
           },
           onChange: setEditableRowKeys,
         }}

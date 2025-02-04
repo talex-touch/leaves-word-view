@@ -46,9 +46,9 @@ export function isValidWordTransform(transform: WordTransform): boolean {
     return false;
   }
 
-  if (!transform.data || Object.keys(transform.data).length === 0) {
-    return false;
-  }
+  // if (!transform.data || Object.keys(transform.data).length === 0) {
+  //   return false;
+  // }
 
   if (!transform.example) {
     return false;

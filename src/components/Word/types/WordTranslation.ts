@@ -2,6 +2,8 @@ import type { WordExample } from './WordExample';
 import { isValidPronounce, type WordPronounce } from './WordPronounce';
 
 export interface WordTranslation {
+  id?: number;
+
   type: WordType;
   typeText: string;
   translation: string;
@@ -65,7 +67,7 @@ export function isValidTranslation(translation: WordTranslation): boolean {
   // 判断词性和词性文本是否对应
   if (translation.type !== WordType[translation.typeText as keyof typeof WordType]) {
     // 如果是动词 可以用及物和不及物
-    if (translation.type!== WordType.VERB) {
+    if (translation.type !== WordType.VERB) {
       return false;
     }
 
