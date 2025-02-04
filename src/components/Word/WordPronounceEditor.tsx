@@ -10,23 +10,30 @@ interface WordPronounceEditorProps {
   readonly?: boolean;
 }
 
-export const WordPronounceEditorInner: React.FC<WordPronounceEditorProps> = ({ value, onChange, readonly }) => {
+export const WordPronounceEditorInner: React.FC<WordPronounceEditorProps> = ({
+  value,
+  onChange,
+  readonly,
+}) => {
   const [pronounce, setPronounce] = useState(value ?? emptyWordPronounce());
   const [form] = Form.useForm();
 
   const handleSave = () => {
-    form.validateFields().then((values) => {
-      onChange?.(values as WordPronounce);
-    }).catch((errorInfo) => {
-      console.log('Validation Failed:', errorInfo);
-    });
+    form
+      .validateFields()
+      .then((values) => {
+        onChange?.(values as WordPronounce);
+      })
+      .catch((errorInfo) => {
+        console.log('Validation Failed:', errorInfo);
+      });
   };
 
-  const { generate } = useRemoteAudio()
+  const { generate } = useRemoteAudio();
 
   const handleQuickImport = () => {
-    const url = form.getFieldValue('import')
-    const content = form.getFieldValue('content')
+    const url = form.getFieldValue('import');
+    const content = form.getFieldValue('content');
     if (!content) {
       message.error('请先输入发音内容');
     } else {
@@ -41,88 +48,72 @@ export const WordPronounceEditorInner: React.FC<WordPronounceEditorProps> = ({ v
         return;
       }
 
-      const result = generate(content, SpeechType.BRITISH)
+      const result = generate(content, SpeechType.BRITISH);
 
-      form.setFieldValue('audio', result)
+      form.setFieldValue('audio', result);
 
       message.success('已自动导入音频地址');
     }
-  }
+  };
 
   const handlePreview = () => {
-    const url = form.getFieldValue('audio')
+    const url = form.getFieldValue('audio');
     if (!url) {
       message.error('请先输入发音地址');
       return;
     }
 
-    const audio = new Audio(url)
+    const audio = new Audio(url);
 
-    audio.play()
-  }
+    audio.play();
+  };
 
   const handleValuesChange = (changedValues: any, allValues: any) => {
     setPronounce(allValues as WordPronounce);
 
-    handleSave()
+    handleSave();
   };
 
   return (
-    <Form onValuesChange={handleValuesChange} form={form} initialValues={pronounce} layout="vertical">
+    <Form
+      onValuesChange={handleValuesChange}
+      form={form}
+      initialValues={pronounce}
+      layout="vertical"
+    >
       <Form.Item
         name="content"
         label="发音内容"
         rules={[{ required: !readonly, message: '请输入发音内容!' }]}
       >
-        <Input
-          type="text"
-          placeholder="内容"
-          disabled={readonly}
-        />
+        <Input type="text" placeholder="内容" disabled={readonly} />
       </Form.Item>
       <Form.Item
         name="audio"
         label="音频地址"
         rules={[{ required: !readonly, message: '请输入音频地址!' }]}
       >
-        <Input
-          type="text"
-          placeholder="音频地址"
-          allowClear
-          disabled={readonly}
-        />
-
+        <Input type="text" placeholder="音频地址" allowClear disabled={readonly} />
       </Form.Item>
-      <Form.Item
-      >
-        <div className='flex flex-center gap-2'>
-
-
-          <Button variant='dashed' onClick={handleQuickImport}>
+      <Form.Item>
+        <div className="flex flex-center gap-2">
+          <Button variant="dashed" onClick={handleQuickImport}>
             自动从内容导入
           </Button>
-          <Button variant='filled' color='primary' onClick={handlePreview}>
+          <Button variant="filled" color="primary" onClick={handlePreview}>
             预览试听
           </Button>
         </div>
-
       </Form.Item>
       <Form.Item
         name="description"
         label="音频描述"
         rules={[{ max: 255, message: '音频描述不能超过255个字符!' }]}
       >
-        <Input.TextArea
-          rows={4}
-          placeholder="音频描述"
-          disabled={readonly}
-        />
+        <Input.TextArea rows={4} placeholder="音频描述" disabled={readonly} />
       </Form.Item>
 
-      <Form.Item
-        name="import"
-        label="选择已有音频"
-      >
+      <Form.Item name="import" label="选择已有音频">
         <AudioSelect />
       </Form.Item>
     </Form>
@@ -135,12 +126,15 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
   const [form] = Form.useForm();
 
   const handleSave = () => {
-    form.validateFields().then((values) => {
-      onChange?.(values as WordPronounce);
-      setIsModalVisible(false);
-    }).catch((errorInfo) => {
-      console.log('Validation Failed:', errorInfo);
-    });
+    form
+      .validateFields()
+      .then((values) => {
+        onChange?.(values as WordPronounce);
+        setIsModalVisible(false);
+      })
+      .catch((errorInfo) => {
+        console.log('Validation Failed:', errorInfo);
+      });
   };
 
   const showModal = () => {
@@ -151,11 +145,11 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
     setIsModalVisible(false);
   };
 
-  const { generate } = useRemoteAudio()
+  const { generate } = useRemoteAudio();
 
   const handleQuickImport = () => {
-    const url = form.getFieldValue('import')
-    const content = form.getFieldValue('content')
+    const url = form.getFieldValue('import');
+    const content = form.getFieldValue('content');
     if (!content) {
       message.error('请先输入发音内容');
     } else {
@@ -170,25 +164,25 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
         return;
       }
 
-      const result = generate(content, SpeechType.BRITISH)
+      const result = generate(content, SpeechType.BRITISH);
 
-      form.setFieldValue('audio', result)
+      form.setFieldValue('audio', result);
 
       message.success('已自动导入音频地址');
     }
-  }
+  };
 
   const handlePreview = () => {
-    const url = form.getFieldValue('audio')
+    const url = form.getFieldValue('audio');
     if (!url) {
       message.error('请先输入发音地址');
       return;
     }
 
-    const audio = new Audio(url)
+    const audio = new Audio(url);
 
-    audio.play()
-  }
+    audio.play();
+  };
 
   const handleValuesChange = (changedValues: any, allValues: any) => {
     setPronounce(allValues as WordPronounce);
@@ -196,7 +190,7 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
 
   return (
     <div>
-      <Button size='small' type="dashed" onClick={showModal}>
+      <Button size="small" type="dashed" onClick={showModal}>
         {readonly ? '预览发音' : '配置发音'}
       </Button>
       <Modal
@@ -214,60 +208,47 @@ const WordPronounceEditor: React.FC<WordPronounceEditorProps> = ({ value, onChan
           ),
         ]}
       >
-        <Form onValuesChange={handleValuesChange} form={form} initialValues={pronounce} layout="vertical">
+        <Form
+          onValuesChange={handleValuesChange}
+          form={form}
+          initialValues={pronounce}
+          layout="vertical"
+        >
           <Form.Item
             name="content"
             label="发音内容"
             rules={[{ required: !readonly, message: '请输入发音内容!' }]}
           >
-            <Input
-              type="text"
-              placeholder="内容"
-              disabled={readonly}
-            />
+            <Input type="text" placeholder="内容" disabled={readonly} />
           </Form.Item>
           <Form.Item
             name="audio"
             label="音频地址"
             rules={[{ required: !readonly, message: '请输入音频地址!' }]}
           >
-            <Input
-              type="text"
-              placeholder="音频地址"
-              allowClear
-              disabled={readonly}
-            />
-
+            <Input type="text" placeholder="音频地址" allowClear disabled={readonly} />
           </Form.Item>
-          <Form.Item
-          >
-            <div className='flex flex-center gap-2'>
-
-              {!readonly && <Button variant='dashed' onClick={handleQuickImport}>
-                自动从内容导入
-              </Button>}
-              <Button variant='filled' color='primary' onClick={handlePreview}>
+          <Form.Item>
+            <div className="flex flex-center gap-2">
+              {!readonly && (
+                <Button variant="dashed" onClick={handleQuickImport}>
+                  自动从内容导入
+                </Button>
+              )}
+              <Button variant="filled" color="primary" onClick={handlePreview}>
                 预览试听
               </Button>
             </div>
-
           </Form.Item>
           <Form.Item
             name="description"
             label="音频描述"
             rules={[{ max: 255, message: '音频描述不能超过255个字符!' }]}
           >
-            <Input.TextArea
-              rows={4}
-              placeholder="音频描述"
-              disabled={readonly}
-            />
+            <Input.TextArea rows={4} placeholder="音频描述" disabled={readonly} />
           </Form.Item>
 
-          <Form.Item
-            name="import"
-            label="选择已有音频"
-          >
+          <Form.Item name="import" label="选择已有音频">
             <AudioSelect />
           </Form.Item>
         </Form>

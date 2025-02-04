@@ -9,12 +9,12 @@ export function useRemoteAudio() {
   const generate = (content: string, type: SpeechType = SpeechType.BRITISH) => {
     const url = new URL(REMOTE_BASE_AUDIO)
 
-  url.searchParams.append('type', type.toString())
-  url.searchParams.append('audio', encodeURIComponent(content))
+    url.searchParams.append('type', type.toString())
+    url.searchParams.append('audio', content)
 
-  return url.toString()
+    return url.toString()
   }
-  
+
   return {
     generate
   }
