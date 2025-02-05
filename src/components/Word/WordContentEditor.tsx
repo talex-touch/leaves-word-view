@@ -160,14 +160,21 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         return;
       }
 
-      if (
-        !currentContent.examplePhrases.length ||
-        !currentContent.examplePhrases.every(
-          (example) => example.type === WordExampleTypeEnum.PHRASE && example.translation,
-        )
-      ) {
-        message.error('短语列表未通过检验！');
+      if (!currentContent.examplePhrases.length) {
+        message.error('短语列表未通过检验：列表为空！');
         return;
+      }
+
+      for (let i = 0; i < currentContent.examplePhrases.length; i++) {
+        const example = currentContent.examplePhrases[i];
+        if (example.type !== WordExampleTypeEnum.PHRASE) {
+          message.error(`短语列表未通过检验：第${i + 1}个短语类型错误！`);
+          return;
+        }
+        if (!example.translation) {
+          message.error(`短语列表未通过检验：第${i + 1}个短语缺少翻译！`);
+          return;
+        }
       }
 
       if (!isValidWordDerivedList(currentContent.derived)) {
@@ -296,14 +303,21 @@ const WordContentEditor: React.FC<Prop> = ({ data, value, editable, onChange }) 
         return;
       }
 
-      if (
-        !currentContent.examplePhrases.length ||
-        !currentContent.examplePhrases.every(
-          (example) => example.type === WordExampleTypeEnum.PHRASE && example.translation,
-        )
-      ) {
-        message.error('短语列表未通过检验！');
+      if (!currentContent.examplePhrases.length) {
+        message.error('短语列表未通过检验：列表为空！');
         return;
+      }
+
+      for (let i = 0; i < currentContent.examplePhrases.length; i++) {
+        const example = currentContent.examplePhrases[i];
+        if (example.type !== WordExampleTypeEnum.PHRASE) {
+          message.error(`短语列表未通过检验：第${i + 1}个短语类型错误！`);
+          return;
+        }
+        if (!example.translation) {
+          message.error(`短语列表未通过检验：第${i + 1}个短语缺少翻译！`);
+          return;
+        }
       }
 
       if (!isValidWordDerivedList(currentContent.derived)) {
